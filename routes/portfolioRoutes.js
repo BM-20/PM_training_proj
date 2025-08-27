@@ -7,7 +7,7 @@ const { logger, agent, authenticateToken} = require('../utils/middleware');
 // portfolio routes
 router.get('/portfolio', logger, agent, authenticateToken, portfolioController.getPortfolio); // fetch all tickers
 router.get('/portfolio/:ticker', logger, agent, authenticateToken, portfolioController.getTicker); // fetch a specific ticker
-router.post('/portfolio/',logger, agent, authenticateToken,  portfolioController.addTicker); // add a new ticker 
+router.post('/portfolio',logger, agent, authenticateToken,  portfolioController.addTicker); // add a new ticker 
 router.delete('/portfolio/:ticker', logger, agent, authenticateToken, portfolioController.deleteTicker); // delete a ticker
 router.patch('/portfolio/:ticker', logger, agent, authenticateToken, portfolioController.updateVolumeOfTicker); // update shares volume for spcific ticker
 

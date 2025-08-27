@@ -4,9 +4,9 @@ const jwt = require('jsonwebtoken');
 // fetch all tickers
 const login = async (req, res) => { 
 
-    const { username, password } = req.body;
+    const { firstname, lastname, username, password } = req.body;
 
-    const user = await Users.findAll({
+    const user = await Users.findOne({
         where: {
             username: username,
             password : password
@@ -25,14 +25,19 @@ const login = async (req, res) => {
 const register = async (req, res) => {  
 
     // get user details 
-    const { username, password } = req.body;
+    const { firstname, lastname, username, password } = req.body;
 
     // do some input validation
     if (!username || !password) return res.status(401).json({ error: 'Invalid credentials' });
 
     // create new user
     try {
-        const newUser = await Users.create({ username: username, password: password });
+        const newUser = await Users.create({
+            firstname : firstname,
+            lastname : lastname,
+            username: username, 
+            password: password });
+
         res.status(201).json({
             message : "new user created ",
             user : {...newUser}
