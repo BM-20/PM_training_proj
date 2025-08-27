@@ -7,30 +7,60 @@ const Users = sequelize.define("Users", {
         primaryKey: true,
         autoIncrement: true
     },
-    name: {
+    firstName: {
         type: DataTypes.STRING,
         allowNull: false
     },
-    type: {
+    lastName: {
         type: DataTypes.STRING,
         allowNull: false
     },
-    height: {
-        type: DataTypes.FLOAT,
+    
+    password: {
+        type: DataTypes.STRING,
         allowNull: false
+        
     },
-    weight: {
-        type: DataTypes.FLOAT,
-        allowNull: false
-    },
-    base_experience: {
-        type: DataTypes.INTEGER,
-        allowNull: false
-    },
-    active: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false
+    stocks: {
+        type: DataTypes.JSON,
+        allowNull: true,
+        defaultValue: []
     }
 });
 
-module.exports = Users;
+const transactionLog = sequelize.define("transactionLog", {
+    id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    date: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW
+    },
+    ticker: {
+        type: DataTypes.STRING,
+        allowNull: false
+        
+    },
+    priceBought: {
+        type: DataTypes.FLOAT,
+        allowNull: false
+    },
+    priceSold: {
+        type: DataTypes.FLOAT,
+        allowNull: true
+    },
+    userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: Users,
+            key: 'id'
+        }
+    }
+
+});
+module.exports = { Users, transactionLog };
