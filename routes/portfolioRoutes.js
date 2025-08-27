@@ -1,14 +1,21 @@
+const express = require('express');
 const router = express.Router();
 const portfolioController = require('../controllers/controllers');
+const authController = require('../controllers/auth');
+const { logger, agent, authenticateToken} = require('../utils/middleware');
 
 // portfolio routes
-router.get('/portfolio',  portfolioControllers.getPortfolio); // fetch all tickers
-router.get('/portfolio/:ticker', portfolioControllers.getTicker); // fetch a specific ticker
-router.post('/portfolio/', portfolioControllers.addTicker); // add a new ticker 
-router.delete('/portfolio/:ticker', portfolioControllers.deleteTicker); // delete a ticker
-router.patch('/portfolio/:ticker', portfolioControllers.updateVolumeOfTicker); // update shares volume for spcific ticker
+router.get('/portfolio', logger, agent, authenticateToken, portfolioController.getPortfolio); // fetch all tickers
+router.get('/portfolio/:ticker', logger, agent, authenticateToken, portfolioController.getTicker); // fetch a specific ticker
+router.post('/portfolio/',logger, agent, authenticateToken,  portfolioController.addTicker); // add a new ticker 
+router.delete('/portfolio/:ticker', logger, agent, authenticateToken, portfolioController.deleteTicker); // delete a ticker
+router.patch('/portfolio/:ticker', logger, agent, authenticateToken, portfolioController.updateVolumeOfTicker); // update shares volume for spcific ticker
 
 // auth routes
-// router.post('/login',  portfolioControllers.); // fetch all tickers
-// router.post('/register', portfolioControllers.); // fetch a specific ticker
+router.post('/auth/login', authController.login); // add a new ticker 
+router.post('/auth/register', authController.register); // add a new ticker 
 
+
+
+
+module.exports = router;
