@@ -1,14 +1,20 @@
 const transactionLog = require('../models/transactions')
-var request = require('request');
-const { Users, transactionLog } = require('../models/users');
+const Users = require('../models/users');
 
 // fetch all tickers
 const getPortfolio = async (req, res) => {  
-    res.send("Adding a new ticker...");
+    res.send("Getting all stocks...")
+    try {
+        const stock = req.Users.stocks
+        res.status(200).json(stock);
 }
-
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed fetching stocks' });
+}
+}
 const getTicker = async (req, res) => {  
-    res.send("Adding a new ticker...");
+    res.send("Getting ticker...");
 try {
     const { ticker } = req.params;
     const userId = req.user.id;
@@ -18,7 +24,7 @@ try {
         return res.status(404).json({ message: 'User not found' });
     }
 
-    const stock = user.stocks.find(s => s.ticker === ticker);
+    const stock = Users.stocks.find(s => s.ticker === ticker);
     if (!stock) {
         return res.status(404).json({ message: 'Ticker not found in portfolio' });
     }
@@ -31,7 +37,7 @@ try {
 }
 
 const addTicker = async (req, res) => {  
-
+    res.send("Adding a new ticker...")
     const { date, ticker, priceBought, priceSold, userId } = req.body;
 
     try 
@@ -57,12 +63,37 @@ const addTicker = async (req, res) => {
     // 
 }
 
-const deleteTicker = async (req, res) => {  
-    res.send("Adding a new ticker...");
+const deleteTicker = async (req, res) => { 
+    try {
+        const { ticker } = req.params;
+        const userId = req.user.id;
+
+        const user = await Users.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const stockIndex = user.stocks.findIndex(s => s.ticker === ticker);
+        if (stockIndex === -1) {
+            return res.status(404).json({ message: 'Ticker not found in portfolio' });
+        }
+
+        user.stocks.splice(stockIndex, 1);
+        await user.save();
+
+        res.status(200).json({ message: 'Ticker removed from portfolio' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+
+    
+    
 }
 
-const updateVolumeOfTicker = async (req, res) => {  
-    res.send("Adding a new ticker...");
+const updateTicker = async (req, res) => {  
+    res.send("Updating ticker...")
+    //stock
+    // ;
 }
 
 module.exports = { 
@@ -70,9 +101,8 @@ module.exports = {
     getTicker,
     addTicker,
     deleteTicker,
-    updateVolumeOfTicker,
+    updateTicker,
     };
 
 
-
-module.exports = {getTicker}
+    
