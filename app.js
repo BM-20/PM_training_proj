@@ -13,8 +13,9 @@ require('dotenv').config();
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.json());
 app.use(express.urlencoded({extended : true}))
-app.use('/', portfolioRoutes);
 app.use(cookieParser());
+app.use('/', portfolioRoutes);
+
 
 // ejs setup
 app.set('view engine', 'ejs')
