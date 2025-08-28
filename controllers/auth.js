@@ -52,12 +52,10 @@ const register = async (req, res) => {
     // if get, fetch render the login page
     if (req.method === "GET")
     {
-        res.render('index', {})
+        res.render('register', {})
     }
     else
     {
-        // TODO: ensure that a new user being added to the db has unique username
-
         // get user details 
         const { firstname, lastname, username, password } = req.body;
 
@@ -65,27 +63,36 @@ const register = async (req, res) => {
         if (!username || !password) return res.status(401).json({ error: 'Invalid credentials' });
 
         // create new user
-        try {
-            const newUser = await Users.create({
+        try
+        {
+            const newUser = await Users.create(
+                {
                 firstname : firstname,
                 lastname : lastname,
                 username: username, 
-                password: password });
+                password: password 
+            });
 
-            res.status(201).json({
-                message : "new user created ",
-                user : {...newUser}
-            })
-        } catch (error) {
-            res.status(500).send("error creating new user")
+            // create a new user and redirect the login page
+            res.status(201).render('index', {})
+
+        } 
+        catch (error) 
+        {
+            // re render registration page with error message
+            res
+                .status(500)
+                .render('register', 
+                    {
+                    error : true
+                    })     
         }
     }
 }
 
 module.exports = { 
     login,
-    register,
-        
+    register,  
 };
 
 
