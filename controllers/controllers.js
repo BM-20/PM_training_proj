@@ -5,8 +5,14 @@ const Users = require('../models/users');
 const getPortfolio = async (req, res) => {  
     res.send("Getting all stocks...")
     try {
-        const stock = req.Users.stocks
-        res.status(200).json(stock);
+        //getting stocks for a specific user
+        const userId = req.user.id;
+        const reqUser = await Users.findByPk(userId);
+        if (!reqUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        const stocks = reqUser.stocks;
+        res.status(200).json(stocks);
 }
     catch (error) {
         console.error(error);
