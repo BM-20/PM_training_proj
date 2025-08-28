@@ -1,14 +1,26 @@
 const express = require('express');
 const sequelize = require('./utils/connectToDB');
+const path = require('path');
 const app = express();
 const portfolioRoutes = require('./routes/portfolioRoutes');
-
-app.use(express.static("public"))
-app.use(express.json());
+const expressEjsLayouts = require('express-ejs-layouts');
+const cookieParser = require("cookie-parser");
 
 
 require('dotenv').config();
+
+// middleware
+app.use(express.static(path.join(__dirname, 'public')))
+app.use(express.json());
+app.use(express.urlencoded({extended : true}))
 app.use('/', portfolioRoutes);
+app.use(cookieParser());
+
+// ejs setup
+app.set('view engine', 'ejs')
+app.set('views', path.join(__dirname, 'views'))
+app.use(expressEjsLayouts)
+
 
 // connecting to the database
 sequelize.sync()

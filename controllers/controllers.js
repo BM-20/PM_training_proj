@@ -1,20 +1,30 @@
 const transactionLog = require('../models/transactions')
+const Stocks = require('../models/stocks')
 
 // fetch all tickers
 const getPortfolio = async (req, res) => {  
-    res.send("Adding a new ticker...");
+    res.render('index', {data : "additional data"})
 }
 
 const getTicker = async (req, res) => {  
     res.send("Adding a new ticker...");
 }
 
-const addTicker = async (req, res) => {  
-
-    const { date, ticker, priceBought, priceSold, userId } = req.body;
-
+const addTicker = async (req, res) => {
+    
+    const { ticker, amount, userId } = req.body;
+    
     try 
     {
+        // add new stock to the portfolio
+        const newStock = await Stocks.create
+        ({  
+            ticker,
+            amount,
+            userId  
+        });
+
+        // log transaction
         const newTransaction = await transactionLog.create
         ({
             date,
@@ -36,8 +46,14 @@ const addTicker = async (req, res) => {
     // 
 }
 
-const deleteTicker = async (req, res) => {  
-    res.send("Adding a new ticker...");
+// deletes ticker from user portfolio
+const deleteTicker = async (req, res) => { 
+    
+    const ticker =  req.params.ticker
+
+
+
+    
 }
 
 const updateVolumeOfTicker = async (req, res) => {  

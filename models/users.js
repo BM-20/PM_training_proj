@@ -27,13 +27,14 @@ const Users = sequelize.define("Users", {
     {
         type: DataTypes.STRING,
         allowNull: false
-    },
-    stocks: 
-    {
-        type: DataTypes.JSON,
-        allowNull: true,
-        defaultValue: []
     }
+    // ,
+    // stocks: 
+    // {
+    //     type: DataTypes.JSON,
+    //     allowNull: true,
+    //     defaultValue: []
+    // }
 
 });
 

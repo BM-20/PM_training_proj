@@ -17,6 +17,9 @@ const agent = (req, res, next) => {
 
 // authenticate token
 function authenticateToken(req, res, next) {
+
+  console.log("cookies " , req.cookies);          
+  
   const authHeader = req.headers['authorization'];
   const token = authHeader?.split(' ')[1];
 

@@ -16,8 +16,7 @@ const transactionLog = sequelize.define("transactionLog", {
     },
     ticker: {
         type: DataTypes.STRING,
-        allowNull: false
-        
+        allowNull: false 
     },
     priceBought: {
         type: DataTypes.FLOAT,
@@ -33,9 +32,9 @@ const transactionLog = sequelize.define("transactionLog", {
         references: {
             model: Users,
             key: 'id'
-        }
+        },
+        onDelete: "CASCADE"
     }
-
 });
 
 module.exports = transactionLog;

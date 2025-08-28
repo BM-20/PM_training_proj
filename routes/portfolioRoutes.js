@@ -13,7 +13,11 @@ router.patch('/portfolio/:ticker', logger, agent, authenticateToken, portfolioCo
 
 // auth routes
 router.post('/auth/login', authController.login); // add a new ticker 
+router.get('/auth/login', authController.login); // add a new ticker
+
+
 router.post('/auth/register', authController.register); // add a new ticker 
+router.get('/auth/register', authController.register); // add a new ticker 
 
 
 
