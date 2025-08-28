@@ -14,7 +14,6 @@ const login = async (req, res) => {
     else
     {
         const { username, password } = req.body;
-        console.log(`username ${username}, password ${password}`)
 
         try {
             // look for the user in the table
@@ -32,6 +31,7 @@ const login = async (req, res) => {
             const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
             return res
+            
                 .cookie("access_token", token, {
                     httpOnly: true,
                     secure: process.env.NODE_ENV === "production",
