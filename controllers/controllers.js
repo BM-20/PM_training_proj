@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 const transactionLog = require('../models/transactions')
+=======
+>>>>>>> 6ec3dbb9ab47cd442e43102eca32046fc9b65cf1
 var request = require('request');
 const { Users, transactionLog } = require('../models/users');
 
@@ -8,7 +11,10 @@ const getPortfolio = async (req, res) => {
 }
 
 const getTicker = async (req, res) => {  
+<<<<<<< HEAD
     res.send("Adding a new ticker...");
+=======
+>>>>>>> 6ec3dbb9ab47cd442e43102eca32046fc9b65cf1
 try {
     const { ticker } = req.params;
     const userId = req.user.id;
