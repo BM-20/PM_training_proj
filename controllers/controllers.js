@@ -1,4 +1,7 @@
 const transactionLog = require('../models/transactions')
+const Stocks = require('../models/stocks')
+const axios = require('axios')
+const sequelize = require('../utils/connectToDB');
 
 // fetch all tickers
 const getPortfolio = async (req, res) => { 
@@ -23,12 +26,15 @@ const getPortfolio = async (req, res) => {
             allStockData.push(stockInfo)
         }
 
+        console.log("----------- ALL STOCK DATA ------------- ")
         console.log(allStockData)
+
+        res.render('index', { stocks: allStockData })
     }
         catch (error) {
             res.status(500).json({ message: 'Failed fetching stocks' });
     }
-    res.render('dashboard', {data : "additional data"})
+    
 }
 
 const getTicker = async (req, res) => { 
@@ -182,4 +188,3 @@ module.exports = {
 
 
 
-module.exports = {getTicker}

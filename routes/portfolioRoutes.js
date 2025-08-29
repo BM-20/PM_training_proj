@@ -14,8 +14,6 @@ router.patch('/portfolio/:ticker', logger, agent, authenticateToken, portfolioCo
 // auth routes
 router.post('/auth/login', redirectIfLoggedIn, authController.login); // add a new ticker 
 router.get('/auth/login', redirectIfLoggedIn, authController.login); // add a new ticker
-
-
 router.post('/auth/register', redirectIfLoggedIn, authController.register); // add a new ticker 
 router.get('/auth/register', redirectIfLoggedIn, authController.register); // add a new ticker 
 
