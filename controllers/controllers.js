@@ -1,7 +1,4 @@
 const transactionLog = require('../models/transactions')
-const Stocks = require('../models/stocks')
-const axios = require('axios')
-const sequelize = require('../utils/connectToDB');
 
 // fetch all tickers
 const getPortfolio = async (req, res) => { 
@@ -185,3 +182,4 @@ module.exports = {
 
 
 
+module.exports = {getTicker}
