@@ -165,8 +165,11 @@
         const div = document.createElement("div");
         div.className = "stock-item";
         div.innerHTML = `
-          <span>${stock.symbol}</span>
-          <span class="${stock.change>0?'gain':'loss'}">${stock.change>0?'+':''}${stock.change}%</span>
+ 
+          <a href="#" class="text-light" data-bs-toggle="modal" data-bs-target="#stockModal">
+    ${stock.symbol}
+  </a>
+  <span class="${stock.change>0?'gain':'loss'}">${stock.change>0?'+':''}${stock.change}%</span>
         `;
         container.appendChild(div);
       });
@@ -189,5 +192,21 @@
       input.value="";
     }
   </script>
+  <div class="modal fade" id="stockModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content bg-dark">
+        <div class="modal-header">
+          <h5 class="modal-title">Test Modal</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>Hello 👋</p>
+          <img src="https://images.wallpapersden.com/image/download/new-zealand-orange-mountain-sunset_a2hqZ2WUmZqaraWkpJRqZWWtamVl.jpg" class="img-fluid" alt="...">
+        </div>
+      </div>
+    </div>
+  </div> 
+</div> 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
