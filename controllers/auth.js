@@ -4,52 +4,95 @@ const jwt = require('jsonwebtoken');
 // fetch all tickers
 const login = async (req, res) => { 
 
-    const { firstname, lastname, username, password } = req.body;
+    // if get, fetch render the login page
+    if (req.method === "GET")
+    {
+        res.render('login', {})
+    }
 
-    const user = await Users.findOne({
-        where: {
-            username: username,
-            password : password
-            },
-        });  
+    // otherwise handle login credentials using a post request
+    else
+    {
+        const { username, password } = req.body;
 
-    if (!user) return res.status(401).json({ error: 'Invalid credentials' });
-    const payload = { id: user.id, username: user.username };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+        try {
+            // look for the user in the table
+            const user = await Users.findOne({
+            where: {
+                username: username,
+                password : password
+                },
+            });  
 
-    res.json({ 
-        token : token,
-        user : user });
-}
+            // if user doesnt exist throw an error
+            if (!user) return res.status(401).json({ error: 'Invalid credentials' });
+            const payload = { id: user.id, username: user.username };
+
+            const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+            return res
+            
+                .cookie("access_token", token, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production",
+                })
+                .status(200)
+                .json({ message: "Logged in successfully" });
+                
+            } 
+            catch (error) {
+                console.log("error loging in " , error)
+            }
+        }
+    }
+
 
 const register = async (req, res) => {  
 
-    // get user details 
-    const { firstname, lastname, username, password } = req.body;
+    // if get, fetch render the login page
+    if (req.method === "GET")
+    {
+        res.render('register', {})
+    }
+    else
+    {
+        // get user details 
+        const { firstname, lastname, username, password } = req.body;
 
-    // do some input validation
-    if (!username || !password) return res.status(401).json({ error: 'Invalid credentials' });
+        // do some input validation
+        if (!username || !password) return res.status(401).json({ error: 'Invalid credentials' });
 
-    // create new user
-    try {
-        const newUser = await Users.create({
-            firstname : firstname,
-            lastname : lastname,
-            username: username, 
-            password: password });
+        // create new user
+        try
+        {
+            const newUser = await Users.create(
+                {
+                firstname : firstname,
+                lastname : lastname,
+                username: username, 
+                password: password 
+            });
 
-        res.status(201).json({
-            message : "new user created ",
-            user : {...newUser}
-        })
-    } catch (error) {
-        res.status(500).send("error creating new user")
+            // create a new user and redirect the login page
+            res.status(201).render('login', {})
+
+        } 
+        catch (error) 
+        {
+            // re render registration page with error message
+            res
+                .status(500)
+                .render('register', 
+                    {
+                    error : true
+                    })     
+        }
     }
 }
 
 module.exports = { 
     login,
-    register,
+    register,  
 };
 
 

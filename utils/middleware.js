@@ -16,9 +16,13 @@ const agent = (req, res, next) => {
 };
 
 // authenticate token
-function authenticateToken(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader?.split(' ')[1];
+function authenticateToken(req, res, next) { 
+
+  // const authHeader = req.headers['authorization'];
+  // const token = authHeader?.split(' ')[1];
+
+  // verify cookie 
+  const token = req.cookies.access_token;
 
   if (!token) return res.status(401).json({ error: 'Missing token' });
 

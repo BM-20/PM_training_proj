@@ -2,39 +2,35 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../utils/connectToDB');
 const Users = require('../models/users')
 
-const transactionLog = sequelize.define("transactionLog", {
+const Stocks = sequelize.define("Stocks", { 
     id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
         primaryKey: true,
         autoIncrement: true
     },
-    date: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW
-    },
     ticker: {
         type: DataTypes.STRING,
-        allowNull: false 
+        allowNull: false
+    },
+    amount: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
     },
     priceBought: {
         type: DataTypes.FLOAT,
         allowNull: false
     },
-    priceSold: {
-        type: DataTypes.FLOAT,
-        allowNull: true
-    },
-    userId: {
+    userId: {  
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: Users,
-            key: 'id'
+            model: Users,  
+            key: "id"
         },
-        onDelete: "CASCADE"
+        onDelete: "CASCADE"   
     }
 });
 
-module.exports = transactionLog;
+
+module.exports = Stocks;
