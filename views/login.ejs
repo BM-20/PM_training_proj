@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/css/login.css">
+  <title>Login • Redfolio</title>
+  <style>
+    
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="panel">
+      <div class="brand" aria-label="Brand">
+        <div>
+          <h1>Login for <span style="color: var(--red-400)">Redfolio</span></h1>
+          <p class="sub">Log In to view your page</p>
+        </div>
+      </div>
+
+      <form id="LoginForm" action="/auth/login" method="post" novalidate>
+
+
+        <div class="row full">
+          <label for="username">Username</label>
+          <div class="input"><input type="text" id="username" name="username" autocomplete="username" required placeholder="@alisha.trades" minlength="3" /></div>
+        </div>
+
+        <div class="row full">
+          <label for="password">Password</label>
+          <div class="input" style="position: relative;">
+            <input type="password" id="password" name="password" autocomplete="new-password" required minlength="8" placeholder="••••••••" />
+            <button type="button" class="btn btn-ghost" id="togglePwd" aria-label="Show password">Show</button>
+          </div>
+          <div class="password-tools full">
+            <div class="strength" aria-hidden="true"><span id="strengthBar"></span></div>
+          </div>
+        </div>
+
+
+        <div class="actions full">
+          <button class="btn btn-primary" type="submit">Log In</button>
+          <button class="btn btn-ghost" type="button" id="toggleTheme">
+            <span class="switch" id="themeSwitch" aria-hidden="true"><span></span></span>
+            &nbsp;<span class="meta">Toggle light / dark</span>
+          </button>
+        </div>
+
+
+      </form>
+    </section>
+
+  </div>
+
+<script src="/js/login.js"></script>
+</body>
+</html>

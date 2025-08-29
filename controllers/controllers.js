@@ -4,12 +4,48 @@ const axios = require('axios')
 const sequelize = require('../utils/connectToDB');
 
 // fetch all tickers
-const getPortfolio = async (req, res) => {  
+const getPortfolio = async (req, res) => { 
+    allStockData = []
+
+    try {
+        //getting stocks for a specific user
+        const userId = req.user.id;
+
+        let userStocks = await Stocks.findAll({
+            where : {
+                userId
+            }
+        })
+
+        for (const stock of userStocks) {
+            let data = await getTickerData(userId, stock.dataValues.ticker);
+            let stockInfo = {
+                ...data,
+                ...stock.dataValues
+            }
+            allStockData.push(stockInfo)
+        }
+
+        console.log(allStockData)
+    }
+        catch (error) {
+            res.status(500).json({ message: 'Failed fetching stocks' });
+    }
     res.render('dashboard', {data : "additional data"})
 }
 
-const getTicker = async (req, res) => {  
-    res.send("Adding a new ticker...");
+const getTicker = async (req, res) => { 
+    
+    try {
+        const { id: userId } = req.user;
+        const { ticker } = req.params;
+
+        const data = await getTickerData(userId, ticker);
+        res.status(200).json(data);
+
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
 }
 
 
@@ -50,7 +86,8 @@ const addTicker = async (req, res) => {
         const haveStockAlready = await Stocks.findOne({
             where: { 
                 userId : userId, 
-                ticker : ticker },
+                ticker : ticker,
+                },
             transaction: t
         });
 
@@ -61,7 +98,7 @@ const addTicker = async (req, res) => {
 
         // Add new stock to the users portfolio
         const newStock = await Stocks.create(
-            { ticker, amount, userId },
+            { ticker, amount, priceBought, userId},
             { transaction: t }
         );
 
@@ -92,8 +129,6 @@ const addTicker = async (req, res) => {
 };
 
 
-
-
 // deletes ticker from user portfolio
 const deleteTicker = async (req, res) => { 
     const ticker =  req.params.ticker 
@@ -103,6 +138,41 @@ const updateVolumeOfTicker = async (req, res) => {
     res.send("Adding a new ticker...");
 }
 
+
+
+/// helper functions
+async function getTickerData(userId, ticker) {
+    // fetch current stock info
+    const response = await axios.get("https://finnhub.io/api/v1/quote", {
+        params: {
+            symbol: ticker.toUpperCase(),
+            token: process.env.FINHUB_API_KEY
+        }
+    });
+
+    if (!response.data || (response.data.c === 0 && response.data.t === 0)) {
+        throw new Error("Invalid or unknown stock symbol");
+    }
+
+    // fetch the bought stock record
+    const boughtStock = await Stocks.findOne({
+        where: { userId, ticker }
+    });
+
+    if (!boughtStock) {
+        throw new Error("User has not bought this stock");
+    }
+
+    let boughtStockPrice = boughtStock.priceBought;
+    let boughtAmount = boughtStock.amount;
+    let currStockPrice = response.data.c;
+
+    // calc stats
+    let percentageChange = ((currStockPrice - boughtStockPrice) / boughtStockPrice) * 100;
+    let returns = (currStockPrice - boughtStockPrice) * boughtAmount;
+
+    return { percentageChange, returns, currStockPrice, boughtStockPrice };
+}
 
 
 module.exports = { 

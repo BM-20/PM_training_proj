@@ -17,6 +17,10 @@ const Stocks = sequelize.define("Stocks", {
         allowNull: false,
         defaultValue: 0
     },
+    priceBought: {
+        type: DataTypes.FLOAT,
+        allowNull: false
+    },
     userId: {  
         type: DataTypes.INTEGER,
         allowNull: false,

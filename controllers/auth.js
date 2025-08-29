@@ -7,7 +7,7 @@ const login = async (req, res) => {
     // if get, fetch render the login page
     if (req.method === "GET")
     {
-        res.render('index', {})
+        res.render('login', {})
     }
 
     // otherwise handle login credentials using a post request
@@ -74,7 +74,7 @@ const register = async (req, res) => {
             });
 
             // create a new user and redirect the login page
-            res.status(201).render('index', {})
+            res.status(201).render('login', {})
 
         } 
         catch (error) 

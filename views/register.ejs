@@ -1,29 +1,79 @@
-<form action="/auth/register" method="post">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/css/register.css">
+  <title>Register • Redfolio</title>
+  <style>
 
-  <div class="container">
-    <h1>Register</h1>
-    <p>Please fill in this form to create an account.</p>
-    <hr>
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="panel">
+      <div class="brand" aria-label="Brand">
+        <div>
+          <h1>Register for <span style="color: var(--red-400)">Redfolio</span></h1>
+          <p class="sub">Create your account to manage your stock.</p>
+        </div>
+      </div>
 
-    <label for="firstname"><b>First name</b></label>
-    <input type="firstname" placeholder="Enter firstname" name="firstname" id="firstname" required>
+      <form id="registerForm" action="/auth/register" method="post" novalidate>
+        <div class="row">
+          <label for="firstname">First name</label>
+          <div class="input"><input type="text" id="firstname" name="firstname" autocomplete="given-name" required placeholder="Alisha" /></div>
+          <small class="help" id="firstNameHelp"></small>
+        </div>
 
-    <label for="lastname"><b>Last name</b></label>
-    <input type="lastname" placeholder="Enter lastname" name="lastname" id="lastname" required>
+        <div class="row">
+          <label for="lastname">Last name</label>
+          <div class="input"><input type="text" id="lastname" name="lastname" autocomplete="family-name" required placeholder="Thapa" /></div>
+          <small class="help" id="lastNameHelp"></small>
+        </div>
 
-    <label for="username"><b>Username </b></label>
-    <input type="username" placeholder="username" name="username" id="username" required>
+        <div class="row full">
+          <label for="username">Username</label>
+          <div class="input"><input type="text" id="username" name="username" autocomplete="username" required placeholder="@alisha.trades" minlength="3" /></div>
+          <small class="help" id="userNameHelp">Use 3–24 characters. Letters, numbers, underscores.</small>
+        </div>
 
-    <label for="password"><b>password </b></label>
-    <input type="password" placeholder="password" name="password" id="password" required>
+        <div class="row full">
+          <label for="password">Password</label>
+          <div class="input" style="position: relative;">
+            <input type="password" id="password" name="password" autocomplete="new-password" required minlength="8" placeholder="••••••••" />
+            <button type="button" class="btn btn-ghost" id="togglePwd" aria-label="Show password">Show</button>
+          </div>
+          <div class="password-tools full">
+            <div class="strength" aria-hidden="true"><span id="strengthBar"></span></div>
+            <small class="help" id="pwdHint">Use 8+ chars with a mix of letters, numbers & symbols.</small>
+          </div>
+        </div>
 
-    <hr>
+    
 
-    <p>By creating an account you agree to our <a href="#">Terms & Privacy</a>.</p>
-    <button type="submit" class="registerbtn">Register</button>
+        <div class="row full">
+          <label class="sr-only" for="terms">Terms</label>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <input type="checkbox" id="terms" required />
+            <span class="meta">I agree to the <a href="#" style="color: var(--red-300); text-decoration: none;">Terms</a> & <a href="#" style="color: var(--red-300); text-decoration: none;">Privacy</a>.</span>
+          </div>
+        </div>
+
+        <div class="actions full">
+          <button class="btn btn-primary" type="submit">Create account</button>
+          <button class="btn btn-ghost" type="button" id="toggleTheme">
+            <span class="switch" id="themeSwitch" aria-hidden="true"><span></span></span>
+            &nbsp;<span class="meta">Toggle light / dark</span>
+          </button>
+        </div>
+
+        <p class="footer full">Already have an account? <a href="#" style="color: var(--red-300); text-decoration: none;">Sign in</a></p>
+      </form>
+    </section>
+
   </div>
 
-  <div class="container signin">
-    <p>Already have an account? <a href="#">Sign in</a>.</p>
-  </div>
-</form>
+  <script src="/js/register.js"></script>
+</body>
+</html>
