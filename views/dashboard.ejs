@@ -50,43 +50,82 @@
 
     <!-- Overview Section -->
      
-    <div class="container-fluid py-3">
-    <div class="row">
-      <!-- Sidebar: Stock Overview -->
-      <div class="col-md-3">
-        <h2 id="overviewTitle">Overview</h2>
-        <div class="stock-list" id="stockList">
-          <% if (stocks && stocks.length > 0) { %>
-            <% stocks.forEach(stock => { %>
-              <div class="stock-item">
-                <span class="ticker"><%= stock.ticker %></span>
-                <span class="change <%= stock.percentageChange > 0 ? 'gain' : 'loss' %>">
-                  <%= stock.percentageChange > 0 ? '+' : '' %><%= stock.percentageChange.toFixed(2) %>%
-                </span>
-              </div>
-            <% }) %>
-          <% } else { %>
-            <p>No stocks found in your portfolio.</p>
-          <% } %>
-        </div>
+
+<div class="container-fluid py-3 mt-5">
+  <div class="row">
+    <!-- Sidebar: Stock Overview -->
+    <div class="col-md-3">
+      <h2 id="overviewTitle">Overview</h2>
+      <div class="stock-list" id="stockList">
+        <% if (stocks && stocks.length > 0) { %>
+          <% stocks.forEach(stock => { %>
+            <div class="stock-item">
+              <span class="ticker"><%= stock.ticker %></span>
+              <span class="change <%= stock.percentageChange > 0 ? 'gain' : 'loss' %>">
+                <%= stock.percentageChange > 0 ? '+' : '' %><%= stock.percentageChange.toFixed(2) %>%
+              </span>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <p>No stocks found in your portfolio.</p>
+        <% } %>
       </div>
+    </div>
 
-      <!-- Main Content: Charts -->
-      <div class="col-md-9">
-        <!-- Pie Chart: Stock Allocation -->
-        <div class="card bg-dark text-white mb-3 p-3">
-          <h4>Stock Allocation</h4>
-          <canvas id="pieChart" width="200px" height="200px"></canvas>
+    <!-- Main Content: Carousel Charts -->
+    <div class="col-md-9">
+      <div id="chartCarousel" class="carousel slide mt-4" data-bs-ride="carousel">
+        <div class="carousel-inner">
+          <!-- Pie Chart -->
+          <div class="carousel-item active">
+            <div class="card bg-dark text-white p-3">
+              <h4>Stock Allocation</h4>
+
+              <div class="chart-container">
+                <canvas id="pieChart"></canvas>
+              </div>
+              
+            </div>
+          </div>
+
+          <!-- Second Chart: Portfolio Value Split -->
+          <div class="carousel-item">
+            <div class="card bg-dark text-white mb-3 p-3">
+              <h4>Portfolio Value Split</h4>
+
+              <div class="chart-container">
+                 <canvas id="valuePieChart"></canvas>
+              </div>
+             
+            </div>
+          </div>
+
+          <!-- Line Chart -->
+          <div class="carousel-item">
+            <div class="card bg-dark text-white p-3">
+              <h4>Portfolio Growth</h4>
+
+              
+              <canvas id="lineChart"></canvas>
+              
+              
+            </div>
+          </div>
         </div>
 
-        <!-- Line Chart: Portfolio Growth -->
-        <div class="card bg-dark text-white p-3">
-          <h4>Portfolio Growth</h4>
-          <canvas id="lineChart"></canvas>
-        </div>
+        <!-- Carousel Controls -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#chartCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#chartCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon"></span>
+        </button>
       </div>
     </div>
   </div>
+</div>
+
+
 
     <!-- AI Chat Section -->
     <section id="chatSection" class="d-none">
@@ -142,16 +181,33 @@
     // Convert backend data into JS arrays
     const stocks = <%- JSON.stringify(stocks) %>;
     const portfolioHistory = <%- JSON.stringify(portfolioHistory) %>;
+    const values = stocks.map(stock => stock.amount * stock.currStockPrice);
 
-    // Pie chart for stock allocation
+    // Pie chart for stock allocation (by amount of shares)
     const pieCtx = document.getElementById('pieChart').getContext('2d');
     new Chart(pieCtx, {
       type: 'pie',
       data: {
         labels: stocks.map(s => s.ticker),
         datasets: [{
+          label: 'Share Allocation',
           data: stocks.map(s => s.amount),
           backgroundColor: ['#0d6efd','#4CAF50','#FF4136','#FFC107','#6610f2','#20c997']
+        }]
+      },
+      options: { plugins: { legend: { labels: { color: '#fff' } } } }
+    });
+
+    // Second Pie Chart (value split)
+    const valuePieCtx = document.getElementById('valuePieChart').getContext('2d');
+    new Chart(valuePieCtx, {
+      type: 'pie',
+      data: {
+        labels: stocks.map(s => s.ticker),
+        datasets: [{
+          label: 'Value Split',
+          data: values,
+          backgroundColor: ['#ff6384','#36a2eb','#ffce56','#4bc0c0','#9966ff','#ff9f40']
         }]
       },
       options: { plugins: { legend: { labels: { color: '#fff' } } } }
@@ -181,6 +237,7 @@
       }
     });
   </script>
+
 
 </body>
 </html>

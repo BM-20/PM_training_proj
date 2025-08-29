@@ -115,11 +115,19 @@ nav button.active {
      border-bottom:none; 
     }
 
-#pieChart {
-    width: 45vw;   /* 30% of viewport width */
-    height: 45vw;  /* keep it square */
-    max-width: 400px;   /* optional upper limit */
-    margin: auto;
+.chart-container {
+  width: 45vw;          /* responsive width */
+  max-width: 400px;     /* optional max width */
+  aspect-ratio: 1 / 1;  /* forces square container for pie charts */
+  margin: auto;
+}
+.chart-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+body {
+  padding-bottom: 70px; 
 }
 
 .gain { 

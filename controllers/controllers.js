@@ -41,7 +41,7 @@ const getPortfolio = async (req, res) => {
             { date: "2025-08-03", value: 9800 }
             ];
 
-        res.render('index', { 
+        res.render('dashboard', { 
             stocks: allStockData,
             portfolioHistory
 
