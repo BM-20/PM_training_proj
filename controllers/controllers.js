@@ -1,4 +1,3 @@
-const transactionLog = require('../models/transactions')
 var request = require('request');
 const { Users, transactionLog } = require('../models/users');
 
@@ -8,7 +7,6 @@ const getPortfolio = async (req, res) => {
 }
 
 const getTicker = async (req, res) => {  
-    res.send("Adding a new ticker...");
 try {
     const { ticker } = req.params;
     const userId = req.user.id;

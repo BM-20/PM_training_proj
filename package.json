@@ -10,6 +10,7 @@
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.14.3",
     "parser": "^0.1.4",
+    "request": "^2.88.2",
     "sequelize": "^6.37.7"
   }
 }
