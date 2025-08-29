@@ -7,6 +7,12 @@ const sequelize = require('../utils/connectToDB');
 const getPortfolio = async (req, res) => { 
     allStockData = []
 
+    const portfolioHistory = [
+      { date: "2025-08-01", value: 10000 },
+      { date: "2025-08-02", value: 10200 },
+      { date: "2025-08-03", value: 9800 }
+    ];
+
     try {
         //getting stocks for a specific user
         const userId = req.user.id;
@@ -28,8 +34,18 @@ const getPortfolio = async (req, res) => {
 
         console.log("----------- ALL STOCK DATA ------------- ")
         console.log(allStockData)
+        
+        const portfolioHistory = [
+            { date: "2025-08-01", value: 10000 },
+            { date: "2025-08-02", value: 10200 },
+            { date: "2025-08-03", value: 9800 }
+            ];
 
-        res.render('index', { stocks: allStockData })
+        res.render('index', { 
+            stocks: allStockData,
+            portfolioHistory
+
+         })
     }
         catch (error) {
             res.status(500).json({ message: 'Failed fetching stocks' });
@@ -142,6 +158,12 @@ const updateVolumeOfTicker = async (req, res) => {
 }
 
 
+const add = async (req, res) => {  
+    res.render('dashboard')
+}
+
+
+
 
 /// helper functions
 async function getTickerData(userId, ticker) {
@@ -184,6 +206,7 @@ module.exports = {
     addTicker,
     deleteTicker,
     updateVolumeOfTicker,
+    add
     };
 
 

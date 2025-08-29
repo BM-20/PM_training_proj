@@ -55,3 +55,4 @@ pwd.addEventListener('input', () => {
                         : s > 40 ? 'linear-gradient(90deg, #ff9800, #f57c00)'
                                 : 'linear-gradient(90deg, var(--red-400), var(--red-700))';
 });
+

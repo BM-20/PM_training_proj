@@ -4,29 +4,16 @@
   <meta charset="UTF-8">
   <title>Stock Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Bootstrap -->
+
+  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Icons -->
+  <!-- Boxicons -->
   <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 
-  <style>
-    body { background:#000; color:#fff; }
-    header { background:#111; color:#fff; padding:1rem; display:flex; justify-content:space-between; align-items:center; }
-    nav button.active { color:#0d6efd; }
-    .stock-list { background:#111; border-radius:5px; padding:10px; margin-top:1rem; }
-    .stock-item { display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #333; }
-    .stock-item:last-child { border-bottom:none; }
-    .gain { color:#4CAF50; font-weight:bold; }
-    .loss { color:#FF4136; font-weight:bold; }
-    .chat-box { background:#111; border-radius:5px; height:400px; display:flex; flex-direction:column; margin-top:1rem; }
-    .chat-messages { flex:1; overflow-y:auto; padding:10px; }
-    .chat-input { display:flex; gap:5px; padding:10px; border-top:1px solid #444; }
-    .chat-input input { flex:1; }
-    .tradingview-widget-container { margin-top:1rem; }
-    .modal-content { background:#111; color:#fff; }
-  </style>
+  <link rel="stylesheet" href="/css/dashboard.css">
 </head>
 <body>
+
   <!-- Header -->
   <header>
     <h1 id="title">📊 Stock Dashboard</h1>
@@ -34,6 +21,7 @@
   </header>
 
   <div class="container py-3">
+   
     <!-- TradingView Ticker Tape -->
     <div class="tradingview-widget-container">
       <div class="tradingview-widget-container__widget"></div>
@@ -61,41 +49,46 @@
     </div>
 
     <!-- Overview Section -->
-    <section id="overviewSection">
-      <h2 id="overviewTitle">Overview</h2>
-      <div class="stock-list" id="stockList"></div>
-    </section>
-
-    <!-- Chart Section -->
-    <section id="chartSection" class="d-none">
-      <h2 id="chartTitle">Charts</h2>
-      <div class="tradingview-widget-container">
-        <div class="tradingview-widget-container__widget" style="height:600px; width:100%"></div>
-        <div class="tradingview-widget-copyright">
-          <a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">
-            <span class="blue-text">Charts by TradingView</span>
-          </a>
+     
+    <div class="container-fluid py-3">
+    <div class="row">
+      <!-- Sidebar: Stock Overview -->
+      <div class="col-md-3">
+        <h2 id="overviewTitle">Overview</h2>
+        <div class="stock-list" id="stockList">
+          <% if (stocks && stocks.length > 0) { %>
+            <% stocks.forEach(stock => { %>
+              <div class="stock-item">
+                <span class="ticker"><%= stock.ticker %></span>
+                <span class="change <%= stock.percentageChange > 0 ? 'gain' : 'loss' %>">
+                  <%= stock.percentageChange > 0 ? '+' : '' %><%= stock.percentageChange.toFixed(2) %>%
+                </span>
+              </div>
+            <% }) %>
+          <% } else { %>
+            <p>No stocks found in your portfolio.</p>
+          <% } %>
         </div>
-        <!-- TradingView Chart Widget -->
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-        {
-          "allow_symbol_change": true,
-          "autosize": true,
-          "symbol": "NASDAQ:AAPL",   // 🔹 CHANGE HERE for default stock
-          "interval": "D",
-          "theme": "dark",
-          "style": "1",
-          "locale": "en",
-          "hide_side_toolbar": true,
-          "save_image": true,
-          "backgroundColor": "#0F0F0F",
-          "gridColor": "rgba(242, 242, 242, 0.06)"
-        }
-        </script>
       </div>
-    </section>
 
-    <!-- AI Chat -->
+      <!-- Main Content: Charts -->
+      <div class="col-md-9">
+        <!-- Pie Chart: Stock Allocation -->
+        <div class="card bg-dark text-white mb-3 p-3">
+          <h4>Stock Allocation</h4>
+          <canvas id="pieChart" width="200px" height="200px"></canvas>
+        </div>
+
+        <!-- Line Chart: Portfolio Growth -->
+        <div class="card bg-dark text-white p-3">
+          <h4>Portfolio Growth</h4>
+          <canvas id="lineChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- AI Chat Section -->
     <section id="chatSection" class="d-none">
       <h2 id="chatTitle">AI Assistant</h2>
       <div class="chat-box">
@@ -108,6 +101,21 @@
         </div>
       </div>
     </section>
+
+    <!-- Add Stock Modal -->
+    <div class="modal fade" id="addStockModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-3">
+          <h4 class="mb-3">Add New Stock</h4>
+          <input type="text" id="newStockTicker" placeholder="Ticker Symbol" class="form-control mb-2">
+          <input type="number" id="newStockAmount" placeholder="Amount" class="form-control mb-3">
+          <div class="d-flex justify-content-between">
+            <button class="btn btn-success" onclick="submitNewStock()">Submit</button>
+            <button class="btn btn-secondary" onclick="closeAddStockModal()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Bottom Navigation -->
@@ -116,8 +124,8 @@
       <button class="btn text-white active" id="navOverview" onclick="showSection('overview')">
         <i class='bx bx-home'></i><div>Overview</div>
       </button>
-      <button class="btn text-white" id="navChart" onclick="showSection('chart')">
-        <i class='bx bx-line-chart'></i><div>Charts</div>
+      <button class="btn text-white btn-circle" id="navAddStock" onclick="openAddStockModalNav()">
+        <i class='bx bx-plus'></i>
       </button>
       <button class="btn text-white" id="navChat" onclick="showSection('chat')">
         <i class='bx bx-bot'></i><div>AI</div>
@@ -125,69 +133,54 @@
     </div>
   </nav>
 
+  <!-- Bootstrap JS bundle (with Popper) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/dashboard.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    let lang = "en";
-    const translations = {
-      en: { title:"📊 Stock Dashboard", overview:"Overview", chat:"AI Assistant", chart:"Charts" },
-      es: { title:"📊 Panel de Acciones", overview:"Visión General", chat:"Asistente IA", chart:"Gráficas" }
-    };
+    // Convert backend data into JS arrays
+    const stocks = <%- JSON.stringify(stocks) %>;
+    const portfolioHistory = <%- JSON.stringify(portfolioHistory) %>;
 
-    function switchLanguage() {
-      lang = (lang === "en") ? "es" : "en";
-      document.getElementById("title").innerText = translations[lang].title;
-      document.getElementById("overviewTitle").innerText = translations[lang].overview;
-      document.getElementById("chatTitle").innerText = translations[lang].chat;
-      document.getElementById("chartTitle").innerText = translations[lang].chart;
-      document.getElementById("langBtn").innerText = (lang === "en" ? "ES" : "EN");
-      document.getElementById("chatMessages").innerHTML = `<div><b>AI:</b> ${lang==="en" ? "Hello! Ask me about stock insights 📈" : "¡Hola! Pregúntame sobre las acciones 📈"}</div>`;
-    }
+    // Pie chart for stock allocation
+    const pieCtx = document.getElementById('pieChart').getContext('2d');
+    new Chart(pieCtx, {
+      type: 'pie',
+      data: {
+        labels: stocks.map(s => s.ticker),
+        datasets: [{
+          data: stocks.map(s => s.amount),
+          backgroundColor: ['#0d6efd','#4CAF50','#FF4136','#FFC107','#6610f2','#20c997']
+        }]
+      },
+      options: { plugins: { legend: { labels: { color: '#fff' } } } }
+    });
 
-    function showSection(section) {
-      ["overview","chart","chat"].forEach(s=>document.getElementById(s+"Section").classList.add("d-none"));
-      document.getElementById(section+"Section").classList.remove("d-none");
-      document.querySelectorAll("nav button").forEach(btn=>btn.classList.remove("active"));
-      document.getElementById("nav"+capitalize(section)).classList.add("active");
-    }
-    function capitalize(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
-
-    // 📊 Dummy stock data
-    const dummyStocks = [
-      { symbol:"AAPL", change:+5.32 },
-      { symbol:"TSLA", change:-3.12 },
-      { symbol:"AMZN", change:+2.15 },
-      { symbol:"MSFT", change:-1.45 },
-      { symbol:"GOOGL", change:+4.80 }
-    ];
-    function renderStocks(){
-      const container = document.getElementById("stockList");
-      container.innerHTML = "";
-      dummyStocks.forEach(stock=>{
-        const div = document.createElement("div");
-        div.className = "stock-item";
-        div.innerHTML = `
-          <span>${stock.symbol}</span>
-          <span class="${stock.change>0?'gain':'loss'}">${stock.change>0?'+':''}${stock.change}%</span>
-        `;
-        container.appendChild(div);
-      });
-    }
-    renderStocks();
-
-    // 🤖 Dummy AI bot
-    function sendMessage(){
-      const input = document.getElementById("userInput");
-      if(!input.value.trim()) return;
-      const msgContainer = document.getElementById("chatMessages");
-      msgContainer.innerHTML += `<div><b>You:</b> ${input.value}</div>`;
-      setTimeout(()=>{
-        let reply = lang==="en" ? 
-          `Based on market trends, stocks look ${["bullish","bearish","volatile"][Math.floor(Math.random()*3)]} 📊` :
-          `Según las tendencias del mercado, las acciones se ven ${["alcistas","bajistas","volátiles"][Math.floor(Math.random()*3)]} 📊`;
-        msgContainer.innerHTML += `<div><b>AI:</b> ${reply}</div>`;
-        msgContainer.scrollTop = msgContainer.scrollHeight;
-      },1000);
-      input.value="";
-    }
+    // Line chart for portfolio growth
+    const lineCtx = document.getElementById('lineChart').getContext('2d');
+    new Chart(lineCtx, {
+      type: 'line',
+      data: {
+        labels: portfolioHistory.map(p => p.date),
+        datasets: [{
+          label: 'Portfolio Value',
+          data: portfolioHistory.map(p => p.value),
+          borderColor: '#0d6efd',
+          backgroundColor: 'rgba(13,110,253,0.2)',
+          fill: true,
+          tension: 0.3
+        }]
+      },
+      options: {
+        plugins: { legend: { labels: { color: '#fff' } } },
+        scales: {
+          x: { ticks: { color: '#fff' }, grid: { color: '#333' } },
+          y: { ticks: { color: '#fff' }, grid: { color: '#333' } }
+        }
+      }
+    });
   </script>
+
 </body>
 </html>
