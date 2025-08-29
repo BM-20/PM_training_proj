@@ -74,7 +74,7 @@ const register = async (req, res) => {
             });
 
             // create a new user and redirect the login page
-            res.status(201).render('login', {})
+            res.redirect('/auth/login')
 
         } 
         catch (error) 

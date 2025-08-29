@@ -34,9 +34,20 @@ function authenticateToken(req, res, next) {
   });
 }
 
+// redirect a user if they are already logged ub
+function redirectIfLoggedIn(req, res, next) {
+
+  if (req.cookies.access_token) {
+    return res.redirect("/portfolio"); 
+  }
+  next();
+}
+
+
 module.exports = { 
     logger, 
     agent,
-    authenticateToken
+    authenticateToken,
+    redirectIfLoggedIn
 
 };

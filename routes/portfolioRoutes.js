@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const portfolioController = require('../controllers/controllers');
 const authController = require('../controllers/auth');
-const { logger, agent, authenticateToken} = require('../utils/middleware');
+const { logger, agent, authenticateToken, redirectIfLoggedIn} = require('../utils/middleware');
 
 // portfolio routes
 router.get('/portfolio', logger, agent, authenticateToken, portfolioController.getPortfolio); // fetch all tickers
@@ -12,12 +12,12 @@ router.delete('/portfolio/:ticker', logger, agent, authenticateToken, portfolioC
 router.patch('/portfolio/:ticker', logger, agent, authenticateToken, portfolioController.updateVolumeOfTicker); // update shares volume for spcific ticker
 
 // auth routes
-router.post('/auth/login', authController.login); // add a new ticker 
-router.get('/auth/login', authController.login); // add a new ticker
+router.post('/auth/login', redirectIfLoggedIn, authController.login); // add a new ticker 
+router.get('/auth/login', redirectIfLoggedIn, authController.login); // add a new ticker
 
 
-router.post('/auth/register', authController.register); // add a new ticker 
-router.get('/auth/register', authController.register); // add a new ticker 
+router.post('/auth/register', redirectIfLoggedIn, authController.register); // add a new ticker 
+router.get('/auth/register', redirectIfLoggedIn, authController.register); // add a new ticker 
 
 
 
