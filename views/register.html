@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../public/css/register.css">
   <title>Register • Redfolio</title>
-
 </head>
 <body>
     <section class="panel">
@@ -47,8 +46,6 @@
           </div>
         </div>
 
-    
-
         <div class="row full">
           <label class="sr-only" for="terms">Terms</label>
           <div style="display:flex; gap:10px; align-items:center;">
@@ -63,14 +60,12 @@
             <span class="switch" id="themeSwitch" aria-hidden="true"><span></span></span>
             &nbsp;<span class="meta">Toggle light / dark</span>
           </button>
-          <button class="btn btn-light btn-sm" onclick="switchLanguage()">🌐 <span id="langBtn">ES</span></button>
+          <button class="btn btn-light btn-sm" type="button" onclick="switchLanguage()">🌐 <span id="langBtn">ES</span></button>
         </div>
 
         <p class="footer full">Already have an account? <a href="#" style="color: var(--red-300); text-decoration: none;">Sign in</a></p>
       </form>
     </section>
-
-  </div>
 
   <script src="/js/register.js"></script>
 </body>

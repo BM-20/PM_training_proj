@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login • Redfolio</title>
+  <title>Register • Redfolio</title>
   <style>
     :root{
       --bg:#000000;
@@ -11,7 +11,7 @@
       --panel-2:#101010;
       --text:#f5f5f5;
       --muted:#b3b3b3;
-      --red:#e11d48; /* red-600 vibe */
+      --red:#e11d48;
       --red-700:#be123c;
       --ring:rgba(225,29,72,.35);
     }
@@ -33,7 +33,6 @@
       padding:16px;
     }
 
-    /* Smaller, centered card panel */
     .panel{
       width:100%;
       max-width:420px;
@@ -49,20 +48,27 @@
       align-items:center;
       justify-content:space-between;
       gap:12px;
+      margin-bottom:8px;
     }
 
     .brand{margin:0; font-weight:700; letter-spacing:.2px; font-size:1.35rem}
     .brand-red{color:var(--red)}
     .sub{margin:.35rem 0 1.1rem; color:var(--muted); font-size:.95rem}
 
-    .row.full{margin:12px 0}
+    .row{margin:12px 0}
+    .row.half{display:flex; gap:10px}
+    .row.half > div{flex:1}
+    .row.full{width:100%}
+
     .input{
       background:#0f0f0f;
       border:1px solid #1b1b1b;
       border-radius:12px;
       padding:10px 12px;
+      position:relative;
     }
-    .input--pw{position:relative; padding-right:84px}
+
+    .input--pw{padding-right:84px}
 
     .input input{
       width:100%;
@@ -75,10 +81,18 @@
     .input input::placeholder{color:#7a7a7a}
 
     label{display:block; margin:0 0 6px; font-size:.95rem}
+    .sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0}
 
     .input:focus-within{
       border-color:var(--red);
       box-shadow:0 0 0 4px var(--ring);
+    }
+
+    .help{
+      font-size:.85rem;
+      color:var(--muted);
+      margin-top:4px;
+      display:block;
     }
 
     /* Buttons */
@@ -91,6 +105,7 @@
       cursor:pointer;
       font-weight:600;
       transition:transform .06s ease, background .2s ease, border-color .2s ease;
+      font-size:.95rem;
     }
     .btn:active{transform:translateY(1px)}
 
@@ -98,6 +113,9 @@
       background:var(--red);
       border-color:var(--red);
       color:white;
+      width:100%;
+      padding:12px;
+      font-size:1rem;
     }
     .btn-primary:hover{background:var(--red-700); border-color:var(--red-700)}
 
@@ -105,6 +123,12 @@
       background:transparent;
       border-color:#2a2a2a;
       color:#e7e7e7;
+      position:absolute;
+      right:8px;
+      top:50%;
+      transform:translateY(-50%);
+      padding:6px 12px;
+      font-size:.85rem;
     }
     .btn-ghost:hover{border-color:#3a3a3a}
 
@@ -123,25 +147,29 @@
     .switch>span{
       position:absolute; left:2px; top:2px; width:18px; height:18px; border-radius:999px; background:#fff; transition:transform .2s ease;
     }
-    
-    /* FIXED: Added the missing active state */
-    .switch.active>span{
-      transform:translateX(16px);
-    }
+    .switch.active>span{transform:translateX(16px)}
 
     .meta{font-size:.9rem; color:#cfcfcf}
 
     /* Actions row */
     .actions{
-      margin-top:14px;
+      margin-top:16px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .actions-row{
       display:flex;
       gap:10px;
-      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
     }
 
     /* Strength bar */
+    .password-tools{margin-top:8px}
     .strength{
-      height:8px; background:#141414; border-radius:999px; overflow:hidden; border:1px solid #1c1c1c; margin-top:8px;
+      height:8px; background:#141414; border-radius:999px; overflow:hidden; border:1px solid #1c1c1c; margin-bottom:4px;
     }
     #strengthBar{
       display:block; height:100%; width:0%;
@@ -149,134 +177,149 @@
       transition:width .25s ease;
     }
 
-    /* Mobile-first sizes already set; small tweaks on larger screens */
-    @media (min-width:480px){
-      .panel{padding:22px}
-    }
-    @media (min-width:768px){
-      .panel{max-width:460px}
+    /* Terms checkbox */
+    .checkbox-row{
+      display:flex; 
+      gap:10px; 
+      align-items:flex-start;
+      margin:16px 0;
     }
 
-    /* FIXED: Enhanced light theme */
-    body.light{
+    .checkbox-row input[type="checkbox"]{
+      margin-top:2px;
+    }
+
+    .footer{
+      text-align:center;
+      margin-top:20px;
+      font-size:.9rem;
+      color:var(--muted);
+    }
+
+    .footer a{
+      color:var(--red);
+      text-decoration:none;
+    }
+    .footer a:hover{
+      text-decoration:underline;
+    }
+
+    /* Mobile adjustments */
+    @media (min-width:480px){
+      .panel{padding:22px; max-width:460px}
+    }
+
+    /* Light theme */
+    .light{
       --bg:#f8fafc;
       --panel:#ffffff;
       --panel-2:#ffffff;
       --text:#0f172a;
       --muted:#475569;
       --ring:rgba(225,29,72,.18);
-      background:var(--bg);
-      color:var(--text);
     }
     
-    body.light .panel{
-      background:linear-gradient(180deg,var(--panel),var(--panel-2));
-      border-color:#e2e8f0;
-      box-shadow:0 20px 40px rgba(0,0,0,.1);
-    }
-    
-    body.light .input{
+    .light .input{
       background:#f1f5f9;
       border-color:#e2e8f0;
     }
     
-    body.light .btn{
+    .light .btn{
       background:#f8fafc;
       border-color:#e2e8f0;
       color:var(--text);
     }
     
-    body.light .btn-ghost{
+    .light .btn-ghost{
       background:transparent;
       border-color:#cbd5e1;
-      color:var(--text);
     }
     
-    body.light .btn-pill{
-      background:#f1f5f9;
-      border-color:#e2e8f0;
-      color:var(--text);
-    }
-    
-    body.light .strength{
+    .light .strength{
       background:#e2e8f0;
       border-color:#cbd5e1;
     }
     
-    body.light .switch{
+    .light .switch{
       background:#e2e8f0;
       border-color:#cbd5e1;
-    }
-    
-    body.light .switch>span{
-      background:#64748b;
-    }
-    
-    body.light .brand-red{
-      color:#be123c;
-    }
-    
-    body.light .meta{
-      color:#64748b;
     }
   </style>
 </head>
 <body>
   <div class="wrapper">
-    <section class="panel" role="main" aria-labelledby="titlePrefix">
+    <section class="panel" role="main">
       <header class="panel__header">
         <h1 class="brand">
-          <span id="titlePrefix">Login for</span>
+          <span id="titlePrefix">Register for</span>
           <span class="brand-red">Redfolio</span>
         </h1>
-
-        <!-- Language toggle (works on click) -->
         <button type="button" id="toggleLang" class="btn btn-pill" aria-label="Switch language">
           ES
         </button>
       </header>
 
-      <p class="sub" id="quote">Log In to view your page</p>
+      <p class="sub" id="quote">Create your account to manage your stocks.</p>
 
-      <form id="LoginForm" action="/auth/login" method="post" novalidate>
+      <form id="registerForm" action="/auth/register" method="post" novalidate>
+        <div class="row half">
+          <div>
+            <label for="firstname" id="firstnameLabel">First name</label>
+            <div class="input">
+              <input type="text" id="firstname" name="firstname" autocomplete="given-name" required placeholder="Alisha" />
+            </div>
+          </div>
+          <div>
+            <label for="lastname" id="lastnameLabel">Last name</label>
+            <div class="input">
+              <input type="text" id="lastname" name="lastname" autocomplete="family-name" required placeholder="Thapa" />
+            </div>
+          </div>
+        </div>
+
         <div class="row full">
           <label for="username" id="usernameLabel">Username</label>
           <div class="input">
-            <input type="text" id="username" name="username"
-                   autocomplete="username" required minlength="3"
-                   placeholder="@alisha.trades" />
+            <input type="text" id="username" name="username" autocomplete="username" required placeholder="@alisha.trades" minlength="3" />
           </div>
+          <small class="help" id="usernameHelp">Use 3–24 characters. Letters, numbers, underscores.</small>
         </div>
 
         <div class="row full">
           <label for="password" id="passwordLabel">Password</label>
           <div class="input input--pw">
-            <input type="password" id="password" name="password"
-                   autocomplete="current-password" required minlength="8"
-                   placeholder="••••••••" />
+            <input type="password" id="password" name="password" autocomplete="new-password" required minlength="8" placeholder="••••••••" />
             <button type="button" class="btn btn-ghost" id="togglePwd" aria-label="Show password">Show</button>
           </div>
-
-          <div class="password-tools full">
-            <div class="strength" aria-hidden="true"><span id="strengthBar"></span></div>
+          <div class="password-tools">
+            <div class="strength"><span id="strengthBar"></span></div>
+            <small class="help" id="passwordHelp">Use 8+ chars with a mix of letters, numbers & symbols.</small>
           </div>
         </div>
 
-        <div class="actions full">
-          <button class="btn btn-primary" type="submit" id="loginBtn">Log In</button>
-
-          <!-- optional theme switch (kept, defaults to dark) -->
-          <button class="btn btn-ghost" type="button" id="toggleTheme">
-            <span class="switch" id="themeSwitch" aria-hidden="true"><span></span></span>
-            &nbsp;<span class="meta" id="themeToggleText">Toggle light / dark</span>
-          </button>
+        <div class="checkbox-row">
+          <input type="checkbox" id="terms" required />
+          <span class="meta" id="termsText">I agree to the <a href="#" style="color: var(--red);">Terms</a> & <a href="#" style="color: var(--red);">Privacy</a>.</span>
         </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" type="submit" id="createBtn">Create account</button>
+          
+          <div class="actions-row">
+            <button class="btn btn-ghost" type="button" id="toggleTheme" style="position:static; transform:none; padding:10px 14px;">
+              <span class="switch" id="themeSwitch"><span></span></span>
+              &nbsp;<span class="meta" id="themeToggleText">Toggle light / dark</span>
+            </button>
+          </div>
+        </div>
+
+        <p class="footer" id="footerText">Already have an account? <a href="#" style="color: var(--red);">Sign in</a></p>
       </form>
     </section>
   </div>
 
   <script>
-    console.log("Login script starting...");
+    console.log("Register script starting...");
 
     // Language system
     const LANG_KEY = 'redfolio-lang';
@@ -285,22 +328,34 @@
 
     const translations = {
       en: {
-        titlePrefix: "Login for",
-        quote: "Log In to view your page",
+        titlePrefix: "Register for",
+        quote: "Create your account to manage your stocks.",
+        firstnameLabel: "First name",
+        lastnameLabel: "Last name", 
         usernameLabel: "Username",
         passwordLabel: "Password",
-        loginBtn: "Log In",
+        usernameHelp: "Use 3–24 characters. Letters, numbers, underscores.",
+        passwordHelp: "Use 8+ chars with a mix of letters, numbers & symbols.",
+        termsText: 'I agree to the <a href="#" style="color: var(--red);">Terms</a> & <a href="#" style="color: var(--red);">Privacy</a>.',
+        createBtn: "Create account",
+        footerText: 'Already have an account? <a href="#" style="color: var(--red);">Sign in</a>',
         themeToggleText: "Toggle light / dark",
         show: "Show",
         hide: "Hide",
         langBtn: "ES"
       },
       es: {
-        titlePrefix: "Acceso para",
-        quote: "Inicia sesión para ver tu página",
+        titlePrefix: "Registro para",
+        quote: "Crea tu cuenta para administrar tus acciones.",
+        firstnameLabel: "Nombre",
+        lastnameLabel: "Apellido",
         usernameLabel: "Usuario",
         passwordLabel: "Contraseña",
-        loginBtn: "Iniciar Sesión",
+        usernameHelp: "Usa de 3 a 24 caracteres. Letras, números, guiones bajos.",
+        passwordHelp: "Usa 8+ caracteres con una mezcla de letras, números y símbolos.",
+        termsText: 'Acepto los <a href="#" style="color: var(--red);">Términos</a> & <a href="#" style="color: var(--red);">Privacidad</a>.',
+        createBtn: "Crear cuenta",
+        footerText: '¿Ya tienes una cuenta? <a href="#" style="color: var(--red);">Inicia sesión</a>',
         themeToggleText: "Alternar claro / oscuro",
         show: "Mostrar",
         hide: "Ocultar",
@@ -322,9 +377,15 @@
       // Update all text elements
       document.getElementById('titlePrefix').textContent = lang.titlePrefix;
       document.getElementById('quote').textContent = lang.quote;
+      document.getElementById('firstnameLabel').textContent = lang.firstnameLabel;
+      document.getElementById('lastnameLabel').textContent = lang.lastnameLabel;
       document.getElementById('usernameLabel').textContent = lang.usernameLabel;
       document.getElementById('passwordLabel').textContent = lang.passwordLabel;
-      document.getElementById('loginBtn').textContent = lang.loginBtn;
+      document.getElementById('usernameHelp').textContent = lang.usernameHelp;
+      document.getElementById('passwordHelp').textContent = lang.passwordHelp;
+      document.getElementById('termsText').innerHTML = lang.termsText;
+      document.getElementById('createBtn').textContent = lang.createBtn;
+      document.getElementById('footerText').innerHTML = lang.footerText;
       document.getElementById('themeToggleText').textContent = lang.themeToggleText;
       document.getElementById('toggleLang').textContent = lang.langBtn;
       
@@ -343,6 +404,31 @@
       localStorage.setItem(LANG_KEY, currentLang);
       applyTranslations();
       console.log("Language switched to", currentLang);
+    }
+
+    // Password strength calculator
+    function scorePassword(value) {
+      let score = 0;
+      if (!value) return 0;
+      
+      const letters = {};
+      for (let i = 0; i < value.length; i++) {
+        letters[value[i]] = (letters[value[i]] || 0) + 1;
+        score += 5.0 / letters[value[i]];
+      }
+      
+      const variations = {
+        digits: /\d/.test(value),
+        lower: /[a-z]/.test(value),
+        upper: /[A-Z]/.test(value),
+        nonWords: /[^\w]/.test(value)
+      };
+      
+      let variationCount = 0;
+      for (let check in variations) variationCount += variations[check] ? 1 : 0;
+      score += (variationCount - 1) * 10;
+      score = Math.min(100, Math.floor(score));
+      return score;
     }
 
     // Initialize everything when DOM loads
@@ -391,6 +477,19 @@
           pwd.focus();
         });
         console.log("Password toggle set up");
+      }
+
+      // Password strength
+      const strengthBar = document.getElementById('strengthBar');
+      if (pwd && strengthBar) {
+        pwd.addEventListener('input', () => {
+          const score = scorePassword(pwd.value);
+          strengthBar.style.width = score + '%';
+          strengthBar.style.background = score > 75 ? 'linear-gradient(90deg, #4caf50, #2e7d32)'
+                                      : score > 40 ? 'linear-gradient(90deg, #ff9800, #f57c00)'
+                                              : 'linear-gradient(90deg, var(--red), var(--red-700))';
+        });
+        console.log("Password strength set up");
       }
 
       console.log("All functionality initialized");

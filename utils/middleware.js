@@ -35,12 +35,25 @@ function authenticateToken(req, res, next) {
 }
 
 // redirect a user if they are already logged ub
-function redirectIfLoggedIn(req, res, next) {
+/*function redirectIfLoggedIn(req, res, next) {
 
   if (req.cookies.access_token) {
     return res.redirect("/portfolio"); 
   }
   next();
+} */
+function redirectIfLoggedIn(req, res, next) {
+  const token = req.cookies.access_token;
+
+  if (!token) return next();
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) return next(); // invalid token → let them log in/register
+
+    // valid token → redirect to portfolio
+    req.user = user;
+    return res.redirect("/portfolio");
+  });
 }
 
 
@@ -50,4 +63,5 @@ module.exports = {
     authenticateToken,
     redirectIfLoggedIn
 
-};
+}; 
+
