@@ -15,6 +15,23 @@
 
   // Section toggling
   function showSection(section) {
+    // check if the secion has class d-none if it does then its not active
+    // if it does it means we are reclicking
+    // ccheck if we are recliking overview secition
+    // if so reroute to /profile
+
+    const overview = document.querySelector(".container-fluid.py-3");
+
+    if (section === "overview") {
+      // check if overview is already visible
+      if (!overview.classList.contains("d-none")) {
+        // it's already active → reroute
+        window.location.href = "/portfolio";
+        return;
+      }
+    } 
+
+
     // hide everything
     document.getElementById("chatSection").classList.add("d-none");
     document.querySelector(".container-fluid.py-3").classList.add("d-none");
@@ -88,12 +105,13 @@ function closeAddStockModal() {
 }
 
 function submitNewStock() {
+
   const ticker = document.getElementById("newStockTicker").value.toUpperCase();
   const amount = parseInt(document.getElementById("newStockAmount").value);
 
   if(!ticker || !amount) { alert("Please fill out both fields!"); return; }
 
-  fetch("/portfolio", {
+  fetch(`/portfolio/${id}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ ticker, amount })

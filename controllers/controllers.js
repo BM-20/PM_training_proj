@@ -18,7 +18,7 @@ const getPortfolio = async (req, res) => {
 
         // fetch all the users portfolios
         const userId = req.user.id;
-        
+
         // load portfolios with stocks
         const portfolios = await Portfolios.findAll({
             where: { userId },
@@ -38,8 +38,26 @@ const getPortfolio = async (req, res) => {
             };
         });
 
+        console.log( ">>>>>> porfolio date ??? ", portfolioData)
+
         res.render('dashboard', { portfolios: portfolioData });
 
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
+
+
+// creates a new portfolio
+const createPortfolio = async (req, res) => { 
+    try {
+        const { name } = req.body;
+        const userId = req.user.id;
+
+        const portfolio = await Portfolios.create({ name, userId });
+        res.status(201).json({
+            portfolio
+        });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -60,19 +78,24 @@ const getPortfolioStocks = async (req, res) => {
     try {
         //getting stocks for a specific user
         const userId = req.user.id;
+        const portfolio = await Portfolios.findByPk(req.params.stocks, {
+            include: [{ model: Stocks}]
+        });
 
-        let userStocks = await Stocks.findAll({
-            where : {
-                userId
-            }
-        })
 
-        for (const stock of userStocks) {
-            let data = await getTickerData(userId, stock.dataValues.ticker);
+        if (!portfolio) {
+            return res.status(404).json({ 
+                message : "Portfolio not found"
+            });
+        }
+
+        for (const stock of portfolio.Stocks) {
+            let data = await getTickerData(userId, stock.ticker);
             let stockInfo = {
                 ...data,
                 ...stock.dataValues
             }
+
             allStockData.push(stockInfo)
         }
 
@@ -85,7 +108,7 @@ const getPortfolioStocks = async (req, res) => {
             { date: "2025-08-03", value: 9800 }
             ];
 
-        res.render('dashboard', { 
+        res.render('stocks', { 
             stocks: allStockData,
             portfolioHistory
 
@@ -266,12 +289,14 @@ const chatBot = async (req, res) => {
 
 module.exports = { 
     getPortfolio,
+    getPortfolioStocks,
     getTicker,
     addTicker,
     deleteTicker,
     updateVolumeOfTicker,
     add,
-    chatBot
+    chatBot,
+    createPortfolio
     };
 
 

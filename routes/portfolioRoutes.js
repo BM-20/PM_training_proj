@@ -8,7 +8,10 @@ const { logger, agent, authenticateToken, redirectIfLoggedIn} = require('../util
 router.get('/portfolio', logger, agent, authenticateToken, portfolioController.getPortfolio); // fetch all tickers
 
 // create new portfolio
-router.get('/portfolio/create', logger, agent, authenticateToken, portfolioController.createPortfolio); 
+router.post('/portfolio/create', logger, agent, authenticateToken, portfolioController.createPortfolio); 
+
+// open a specific portolio
+router.get('/portfolio/:stocks', logger, agent, authenticateToken, portfolioController.getPortfolioStocks); 
 
 
 
