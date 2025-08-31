@@ -2,6 +2,12 @@ const transactionLog = require('../models/transactions')
 const Stocks = require('../models/stocks')
 const axios = require('axios')
 const sequelize = require('../utils/connectToDB');
+const { VertexAI } = require('@google/genai');
+
+// const client = new VertexAI({
+//   projectId: "your-project-id", 
+//   location: "global",
+// });
 
 // fetch all tickers
 const getPortfolio = async (req, res) => { 
@@ -10,7 +16,7 @@ const getPortfolio = async (req, res) => {
     const portfolioHistory = [
       { date: "2025-08-01", value: 10000 },
       { date: "2025-08-02", value: 10200 },
-      { date: "2025-08-03", value: 9800 }
+      { date: "2025-08-03", value: 1300 }
     ];
 
     try {
@@ -199,6 +205,26 @@ async function getTickerData(userId, ticker) {
     return { percentageChange, returns, currStockPrice, boughtStockPrice };
 }
 
+const chatBot = async (req, res) => {
+    try {
+        const { message } = req.body;
+        console.log("message -------------> " , message)
+
+        if (!message) return res.status(400).json({ error: "Message is required" });
+
+        const response = await client.chat({
+        model: "gemini-2.5",
+        messages: [{ role: "user", content: message }],
+        });
+
+        const reply = response.data.choices[0].message.content;
+        res.json({ reply });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error communicating with Gemini API" });
+    }
+}
+
 
 module.exports = { 
     getPortfolio,
@@ -206,7 +232,8 @@ module.exports = {
     addTicker,
     deleteTicker,
     updateVolumeOfTicker,
-    add
+    add,
+    chatBot
     };
 
 

@@ -18,6 +18,9 @@ router.get('/auth/login', redirectIfLoggedIn, authController.login); // add a ne
 router.post('/auth/register', redirectIfLoggedIn, authController.register); // add a new ticker 
 router.get('/auth/register', redirectIfLoggedIn, authController.register); // add a new ticker 
 
+// chat bot
+router.post('/api/chat', logger, agent, authenticateToken, portfolioController.chatBot); // add a new ticker 
+
 
 
 
