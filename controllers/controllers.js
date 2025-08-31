@@ -1,5 +1,6 @@
 const axios = require('axios')
 const cron = require("node-cron");
+const ExcelJS = require("exceljs");
 const sequelize = require('../utils/connectToDB');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
@@ -467,6 +468,59 @@ cron.schedule("0 * * * *", async () => {  // every weekday at 22:00
     });
 
 
+// GET /transactions/download/:portfolioId
+const downloadTransactionData = async (req, res) => {
+  try {
+    console.log("HIIIIIIII ", req.params)
+    const { id : portfolioId } = req.params;
+
+    // Fetch ALL transactions
+    const transactions = await transactionLog.findAll({
+      where: { portfolioId },
+      order: [['date', 'DESC']]
+    });
+
+    // Create workbook
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Transactions");
+
+    // Define columns
+    worksheet.columns = [
+      { header: "Date", key: "date", width: 15 },
+      { header: "Ticker", key: "ticker", width: 15 },
+      { header: "Amount", key: "amount", width: 10 },
+      { header: "Price", key: "price", width: 10 }
+    ];
+
+    // Add rows
+    transactions.forEach(t => {
+      worksheet.addRow({
+        date: t.date.toISOString().slice(0, 10),
+        ticker: t.ticker,
+        amount: t.amount,
+        price: t.price
+      });
+    });
+
+    // Send as file
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=transactions_portfolio_${portfolioId}.xlsx`
+    );
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error generating Excel");
+  }
+};
+
+
 module.exports = { 
     getPortfolio,
     getPortfolioStocks,
@@ -475,7 +529,8 @@ module.exports = {
     deleteTicker,
     updateVolumeOfTicker,
     chatBot,
-    createPortfolio
+    createPortfolio,
+    downloadTransactionData
     };
 
 

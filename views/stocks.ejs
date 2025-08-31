@@ -21,13 +21,7 @@
     <%- include("partials/tickerWidget") %>
 
     <!-- Overview Section -->
-      <div class="ai-disclaimer mt-3 p-3 rounded">
-        <h6 class="text-warning mb-2">⚠️ Note</h6>
-        <p class="mb-0">
-          All stock values are calculated using the current market price at the time of purchase. Historical purchase prices are not retrieved due to API limitations.  
-
-      </div>
-
+      
 
     <div class="container-fluid py-3 mt-5">
     <div class="row">
@@ -64,7 +58,8 @@
   <div class="d-flex justify-content-between align-items-center mb-2">
     <h4 class="mb-0 text-white"> Transactions</h4>
     <!-- Download button -->
-    <a href="/transactions/download/<%= portfolioData.id %>" 
+
+    <a href="/portfolio/<%= portfolioData.id %>/transactions/download/" 
        class="btn btn-sm btn-outline-light" 
        title="Download all transactions">
        <i class="bi bi-download"></i>
