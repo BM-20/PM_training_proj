@@ -38,8 +38,6 @@ const getPortfolio = async (req, res) => {
             };
         });
 
-        console.log( ">>>>>> porfolio date ??? ", portfolioData)
-
         res.render('dashboard', { portfolios: portfolioData });
 
     } catch (err) {
@@ -90,7 +88,8 @@ const getPortfolioStocks = async (req, res) => {
         }
 
         for (const stock of portfolio.Stocks) {
-            let data = await getTickerData(userId, stock.ticker);
+            let data = await getTickerData(req.params.stocks, stock.dataValues.ticker);
+
             let stockInfo = {
                 ...data,
                 ...stock.dataValues
@@ -99,18 +98,22 @@ const getPortfolioStocks = async (req, res) => {
             allStockData.push(stockInfo)
         }
 
-        console.log("----------- ALL STOCK DATA ------------- ")
-        console.log(allStockData)
-        
+        console.log(`>>> All Stock data ${allStockData}`)
+   
         const portfolioHistory = [
             { date: "2025-08-01", value: 10000 },
             { date: "2025-08-02", value: 10200 },
             { date: "2025-08-03", value: 9800 }
             ];
+        
+        portfolioData = {
+            id : req.params.stocks
+        }
 
         res.render('stocks', { 
             stocks: allStockData,
-            portfolioHistory
+            portfolioHistory,
+            portfolioData
 
          })
     }
@@ -122,34 +125,74 @@ const getPortfolioStocks = async (req, res) => {
 
 const getTicker = async (req, res) => { 
     
-    try {
-        const { id: userId } = req.user;
-        const { ticker } = req.params;
+    // try {
+    //     const { id: userId } = req.user;
+    //     const { ticker } = req.params;
 
-        const data = await getTickerData(userId, ticker);
-        res.status(200).json(data);
+    //     const data = await getTickerData(userId, ticker);
+    //     res.status(200).json(data);
 
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
+    // } catch (error) {
+    //     res.status(400).json({ error: error.message });
+    // }
+
+    const { id : portfolioId, ticker } = req.params;
+    const userId = req.user.id;
+
+    // Get stock and portfolio info
+    const stock = await Stocks.findOne({ 
+        where: { 
+            portfolioId,
+            ticker 
+        } 
+    });
+    const transactions = await transactionLog.findAll({ where: { portfolioId, ticker }, order: [['date','DESC']] });
+    const liveData = await getTickerData(portfolioId, ticker);
+    
+    console.log(portfolioId,
+        { 
+            ...stock.dataValues, 
+            ...liveData 
+        },
+        transactions)
+
+    res.render('partials/expandStockModal', {
+        portfolioId,
+        stock: { 
+            ...stock.dataValues, 
+            ...liveData 
+        },
+        transactions
+    });
+
 }
 
 
-// TODO : FIX ERROR CODES
-// NOTE: making the assumption that as the user adds a stock to the system we are 
-// its value is determined by current pricing. Finhub api doesnt offer historical data for free
+
 const addTicker = async (req, res) => {
-    const { ticker, amount } = req.body;
+    console.log("JHERRRRRRRRRRRRRRRRRRRRRRRR ");
 
-    if (!ticker || !amount ) {
-        return res.status(400).json({
-            message: "Ticker, date and amount are required"
-        });
-    }
-
-    const t = await sequelize.transaction();
+    let t; // Declare `t` outside try block to ensure it's accessible in both try and catch
 
     try {
+        const portfolio = await Portfolios.findByPk(req.params.id)
+
+        if (!portfolio) {
+            return res.status(404).json({ 
+                message : "Portfolio not found"
+            });
+        }
+
+        const { ticker, amount } = req.body;
+
+        if (!ticker || !amount ) {
+            return res.status(400).json({
+                message: "Ticker, date and amount are required"
+            });
+        }
+
+        t = await sequelize.transaction(); // Initialize `t` inside try block
+
         const userId = req.user.id;
 
         // Fetch the current stock price
@@ -168,12 +211,14 @@ const addTicker = async (req, res) => {
 
         const priceBought = response.data.c;
 
+        console.log("FINANCIAL DATA __________________ ", priceBought, response.data)
+
         // Check if stock already exists in users table
         const haveStockAlready = await Stocks.findOne({
             where: { 
-                userId : userId, 
+                portfolioId : req.params.id, 
                 ticker : ticker,
-                },
+            },
             transaction: t
         });
 
@@ -182,19 +227,22 @@ const addTicker = async (req, res) => {
             return res.status(403).json({ message: "Stock already exists" });
         }
 
-        // Add new stock to the users portfolio
+        // Add new stock to the user's portfolio
         const newStock = await Stocks.create(
-            { ticker, amount, priceBought, userId},
+            { ticker, amount, priceBought, portfolioId: req.params.id }, 
             { transaction: t }
         );
+
+        console.log(`ticker ${ticker}, price ${priceBought}, amount ${amount}, port ${req.params.id}, `)
 
         // Log the transaction information
         const newTransaction = await transactionLog.create(
             {
                 date: new Date(),
                 ticker,
-                priceBought,
-                userId
+                price: priceBought,
+                amount,
+                portfolioId: req.params.id
             },
             { transaction: t }
         );
@@ -208,7 +256,9 @@ const addTicker = async (req, res) => {
         });
 
     } catch (error) {
-        await t.rollback();
+        if (t) {
+            await t.rollback(); 
+        }
         console.error(error);
         return res.status(500).json({ message: "Error adding ticker", error });
     }
@@ -233,7 +283,8 @@ const add = async (req, res) => {
 
 
 /// helper functions
-async function getTickerData(userId, ticker) {
+async function getTickerData(portfolioId, ticker) {
+
     // fetch current stock info
     const response = await axios.get("https://finnhub.io/api/v1/quote", {
         params: {
@@ -248,7 +299,7 @@ async function getTickerData(userId, ticker) {
 
     // fetch the bought stock record
     const boughtStock = await Stocks.findOne({
-        where: { userId, ticker }
+        where: { portfolioId, ticker }
     });
 
     if (!boughtStock) {
@@ -262,6 +313,8 @@ async function getTickerData(userId, ticker) {
     // calc stats
     let percentageChange = ((currStockPrice - boughtStockPrice) / boughtStockPrice) * 100;
     let returns = (currStockPrice - boughtStockPrice) * boughtAmount;
+
+    console.log("HERE ", { percentageChange, returns, currStockPrice, boughtStockPrice })
 
     return { percentageChange, returns, currStockPrice, boughtStockPrice };
 }

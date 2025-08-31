@@ -13,11 +13,16 @@ router.post('/portfolio/create', logger, agent, authenticateToken, portfolioCont
 // open a specific portolio
 router.get('/portfolio/:stocks', logger, agent, authenticateToken, portfolioController.getPortfolioStocks); 
 
+// add a new ticker to a specific portfolio
+router.post('/portfolio/:id',logger, agent, authenticateToken,  portfolioController.addTicker);
+
+// fetch a specific ticker
+router.get('/portfolio/:id/stock/:ticker', logger, agent, authenticateToken, portfolioController.getTicker);
 
 
-router.get('/portfolio/:ticker', logger, agent, authenticateToken, portfolioController.getTicker); // fetch a specific ticker
+
 router.get('/portfolio/add/add',logger, agent, authenticateToken,  portfolioController.add); // add a new ticker 
-router.post('/portfolio',logger, agent, authenticateToken,  portfolioController.addTicker); // add a new ticker 
+
 router.delete('/portfolio/:ticker', logger, agent, authenticateToken, portfolioController.deleteTicker); // delete a ticker
 router.patch('/portfolio/:ticker', logger, agent, authenticateToken, portfolioController.updateVolumeOfTicker); // update shares volume for spcific ticker
 

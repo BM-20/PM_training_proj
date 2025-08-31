@@ -111,6 +111,11 @@ function submitNewStock() {
 
   if(!ticker || !amount) { alert("Please fill out both fields!"); return; }
 
+  // find the id of the portfolio
+  const pathSegments = window.location.pathname.split('/'); 
+  const id = pathSegments[pathSegments.length - 1]; 
+  if (!id) return alert("ID is missing from the URL!");
+
   fetch(`/portfolio/${id}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

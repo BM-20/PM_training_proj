@@ -1,0 +1,54 @@
+<div class="modal-header border-bottom border-secondary">
+  <h5 class="modal-title"><%= stock.ticker %> Overview</h5>
+  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body">
+  <div class="stock-summary p-3 mb-3 rounded" style="background:#1a1a1a;">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <span class="fw-bold">Current Price:</span>
+      <span>$<%= stock.currStockPrice %></span>
+    </div>
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <span class="fw-bold">Shares Owned:</span>
+      <span><%= stock.amount %></span>
+    </div>
+    <div class="d-flex justify-content-between align-items-center">
+      <span class="fw-bold">Percentage Change:</span>
+      <span class="<%= stock.percentageChange > 0 ? 'gain' : 'loss' %>">
+        <%= stock.percentageChange.toFixed(2) %>%
+      </span>
+    </div>
+  </div>
+
+  <div class="chart-card mb-3 rounded p-3">
+  <div class="chart-inner" style="height: 100%; width: 100%;">
+    <div class="tradingview-widget-container" 
+         id="tradingview_<%= stock.ticker %>" 
+         style="height: 100%; width: 100%;">
+    </div>
+  </div>
+</div>
+  <!-- Transaction History -->
+  <div class="transaction-history mb-3 rounded p-3" style="background:#1a1a1a;">
+    <h6 class="mb-2">Transaction History</h6>
+    <ul class="list-unstyled mb-0">
+      <% transactions.forEach(t => { %>
+        <li class="d-flex justify-content-between border-bottom border-secondary py-1">
+          <span><%= t.date.toISOString().slice(0,10) %></span>
+          <span><%= t.amount %> shares @ $<%= t.price %></span>
+        </li>
+      <% }) %>
+    </ul>
+  </div>
+
+  <!-- Modify Quantity -->
+  <div class="modify-quantity rounded p-3" style="background:#1a1a1a;">
+    <h6>Modify Quantity</h6>
+    <form action="/portfolio/<%= portfolioId %>/stock/<%= stock.ticker %>" method="POST" class="d-flex gap-2">
+      <input type="number" name="amount" value="<%= stock.amount %>" class="form-control">
+      <button type="submit" class="btn btn-success flex-shrink-0">Update</button>
+    </form>
+  </div>
+</div>
+

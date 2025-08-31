@@ -146,9 +146,6 @@ body {
     
     }
 
-
-
-
 .portfolio-card {
   background:#111;
   color:#fff;
@@ -181,3 +178,46 @@ body {
   display:block;
   margin-bottom:0.5rem;
 }
+
+
+.stock-summary, .chart-card, .transaction-history, .modify-quantity {
+  background: #1a1a1a;
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.transaction-history li:last-child {
+  border-bottom: none;
+}
+
+.modal-body h6 {
+  color: #0d6efd;
+  margin-bottom: 0.5rem;
+}
+
+.stock-summary span {
+  font-size: 0.95rem;
+}
+
+.chart-card {
+  position: relative;       
+  overflow: hidden;         
+}
+
+.chart-card .tradingview-widget-container {
+  height: 100% !important; 
+  width: 100% !important;   
+}
+.modify-quantity input {
+  max-width: 80px;
+}
+
+.btn-close-white {
+  filter: invert(1);
+}
+
+.chart-inner {
+  height: calc(100% - 2rem); 
+  width: 100%;
+}
+
