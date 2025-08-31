@@ -233,4 +233,12 @@ body {
   font-weight: bold;
 }
 
+/* hide vertical scrollbar but still allow scroll */
+.stock-list {
+  -ms-overflow-style: none; /* IE, Edge */
+  scrollbar-width: none;    /* Firefox */
+}
+.stock-list::-webkit-scrollbar { 
+  display: none; /* Chrome, Safari, Opera */
+}
 

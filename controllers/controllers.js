@@ -110,10 +110,17 @@ const getPortfolioStocks = async (req, res) => {
             id : req.params.stocks
         }
 
+        const transactions = await transactionLog.findAll({
+            where: { portfolioId: portfolio.id },
+            order: [['date', 'DESC']],  
+            limit: 3                    
+            });
+
         res.render('stocks', { 
             stocks: allStockData,
             portfolioHistory,
-            portfolioData
+            portfolioData,
+            transactions 
 
          })
     }
@@ -137,13 +144,6 @@ const getTicker = async (req, res) => {
     });
     const transactions = await transactionLog.findAll({ where: { portfolioId, ticker }, order: [['date','DESC']] });
     const liveData = await getTickerData(portfolioId, ticker);
-    
-    console.log(portfolioId,
-        { 
-            ...stock.dataValues, 
-            ...liveData 
-        },
-        transactions)
 
     res.render('partials/expandStockModal', {
         portfolioId,

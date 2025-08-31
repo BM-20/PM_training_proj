@@ -24,33 +24,59 @@
       
 
     <div class="container-fluid py-3 mt-5">
-      <div class="row">
-        <!-- Sidebar: Stock Overview -->
-        <div class="col-md-3">
-          <h2 id="overviewTitle">Overview</h2>
-          <div class="stock-list" id="stockList">
-            <% if (stocks && stocks.length > 0) { %>
-              <% stocks.forEach(stock => { %>
-                <div class="stock-item">
+    <div class="row">
+      
+      <!-- Sidebar: Stock Overview + Transactions -->
+      <div class="col-md-3">
+  <h2 id="overviewTitle">Overview</h2>
 
-                  <a href="/portfolio/<%= portfolioData.id %>/stock/<%= stock.ticker %>" 
-                    class="text-light stock-link">
-                    <span class="ticker"><%= stock.ticker %></span>
-                  </a>
-                                  
-                  <span class="change <%= stock.percentageChange > 0 ? 'gain' : 'loss' %>">
-                    <%= stock.percentageChange > 0 ? '+' : '' %><%= stock.percentageChange.toFixed(2) %>%
-                  </span>
-                </div>
-              <% }) %>
-            <% } else { %>
-              <p>No stocks found in your portfolio.</p>
-            <% } %>
+  <div id="stockList" class="stock-list" style="max-height: 250px; overflow-y: auto; position: relative;">
+    <% if (stocks && stocks.length > 0) { %>
+      <% stocks.forEach((stock, index) => { %>
+        <div class="stock-item py-2 px-1 d-flex justify-content-between align-items-center" data-index="<%= index %>">
+          <a href="/portfolio/<%= portfolioData.id %>/stock/<%= stock.ticker %>" class="text-light stock-link">
+            <span class="ticker"><%= stock.ticker %></span>
+          </a>
+          <span class="change <%= stock.percentageChange > 0 ? 'gain' : 'loss' %>">
+            <%= stock.percentageChange > 0 ? '+' : '' %><%= stock.percentageChange.toFixed(2) %>%
+          </span>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <p>No stocks found in your portfolio.</p>
+    <% } %>
+  </div>
+
+  <!-- controls: show more / show less -->
+  <div class="d-flex justify-content-center gap-2 mt-2">
+    <button id="stockPrev" class="btn btn-sm btn-outline-secondary d-none" aria-label="Show previous stocks">Show less</button>
+    <button id="stockNext" class="btn btn-sm btn-outline-secondary" aria-label="Show more stocks">Show more</button>
+  </div>
+
+  <!-- Recent transactions (keeps in sidebar) -->
+  <div class="mt-4">
+    <h4>Recent Transactions</h4>
+    <div class="transaction-list" style="max-height: 200px; overflow-y: auto;">
+      <% if (transactions && transactions.length > 0) { %>
+        <% transactions.slice(0, 5).forEach(t => { %>
+          <div class="transaction-item small text-muted">
+            <%= t.date.toISOString().slice(0,10) %> — 
+            <strong><%= t.ticker %></strong> 
+            (<%= t.amount > 0 ? '+' : '' %><%= t.amount %> @ $<%= t.price %>)
+          </div>
+        <% }) %>
+        <% if (transactions.length > 5) { %>
+          <div class="text-center mt-1"><small class="text-muted">Scroll for more ↓</small></div>
+        <% } %>
+      <% } else { %>
+        <p>No recent transactions.</p>
+      <% } %>
+
           </div>
         </div>
+      </div>
 
-        
-      <!-- Charts -->
+    <!-- Charts -->
       <%- include("partials/charts") %>
 
       <!-- AI Chat Section -->
@@ -83,6 +109,11 @@
         </div>
       </div>
     </div>
+
+  </div>
+</div>
+        
+      
 
    
   
@@ -219,6 +250,73 @@
       });
     });
   }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const PAGE_SIZE = 5;
+    let page = 0;
+
+    const container = document.getElementById('stockList');
+    if (!container) return;
+
+    const items = Array.from(container.querySelectorAll('.stock-item'));
+    const prevBtn = document.getElementById('stockPrev');
+    const nextBtn = document.getElementById('stockNext');
+
+    function updateButtons() {
+      prevBtn.classList.toggle('d-none', page === 0);
+      nextBtn.classList.toggle('d-none', (page + 1) * PAGE_SIZE >= items.length);
+    }
+
+    function scrollToPage(p) {
+      // compute index of first item in page
+      const idx = p * PAGE_SIZE;
+      if (idx >= items.length) return;
+
+      const targetEl = items[idx];
+      // scroll container so that targetEl is at top of container
+      container.scrollTo({
+        top: targetEl.offsetTop,
+        behavior: 'smooth'
+      });
+
+      page = p;
+      updateButtons();
+    }
+
+    // next page
+    nextBtn.addEventListener('click', () => {
+      const maxPage = Math.floor((items.length - 1) / PAGE_SIZE);
+      const newPage = Math.min(page + 1, maxPage);
+      scrollToPage(newPage);
+    });
+
+    // previous page
+    prevBtn.addEventListener('click', () => {
+      const newPage = Math.max(page - 1, 0);
+      scrollToPage(newPage);
+    });
+
+    // if user manually scrolls (wheel/drag), keep buttons in sync
+    let scrollTimeout = null;
+    container.addEventListener('scroll', () => {
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        // guess page by first fully-visible item
+        let firstVisibleIndex = 0;
+        for (let i = 0; i < items.length; i++) {
+          const it = items[i];
+          const top = it.offsetTop - container.scrollTop;
+          if (top >= 0) { firstVisibleIndex = i; break; }
+        }
+        page = Math.floor(firstVisibleIndex / PAGE_SIZE);
+        updateButtons();
+      }, 120);
+    });
+
+    // initialize
+    updateButtons();
+  });
+
 
 
     
