@@ -1,26 +1,31 @@
 <!-- Portfolios Section -->
-    <h2 id="overviewTitle">Your Portfolios</h2>
-    <div class="row g-3" id="portfolioGrid">
-      <% if (portfolios && portfolios.length > 0) { %>
-        <% portfolios.forEach(p => { %>
-          <div class="col-md-4">
-            <div class="portfolio-card" onclick="openPortfolio('<%= p.id %>')">
-                <h4><%= p.name %></h4>
-                <p>Total Value: $<%= p.totalValue.toFixed(2) %></p>
-                <p>Stocks: <%= p.stockCount %></p>
-            </div>
-          </div>
-        <% }) %>
-      <% } %>
-
-      <!-- Create new portfolio block -->
+<h2 id="overviewTitle">Your Portfolios</h2>
+<div class="row g-3" id="portfolioGrid">
+  <% if (portfolios && portfolios.length > 0) { %>
+    <% portfolios.forEach(p => { %>
       <div class="col-md-4">
-        <div class="portfolio-card create-card" onclick="openCreatePortfolioModal()">
-          <i class='bx bx-plus'></i>
-          <p>Create Portfolio</p>
+        <div class="portfolio-card" onclick="openPortfolio('<%= p.id %>')">
+            <!-- Delete button -->
+            <button class="delete-btn" onclick="confirmDelete(event, '<%= p.id %>', '<%= p.name %>')">
+              <i class='bx bx-trash'></i>
+            </button>
+
+            <h4><%= p.name %></h4>
+            <p>Total Value: $<%= p.totalValue.toFixed(2) %></p>
+            <p>Stocks: <%= p.stockCount %></p>
         </div>
       </div>
+    <% }) %>
+  <% } %>
+
+  <!-- Create new portfolio block -->
+  <div class="col-md-4">
+    <div class="portfolio-card create-card" onclick="openCreatePortfolioModal()">
+      <i class='bx bx-plus'></i>
+      <p>Create Portfolio</p>
     </div>
+  </div>
+</div>
   </div>
 
   <!-- Modal: Create Portfolio -->
@@ -36,3 +41,18 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal: Delete Portfolio -->
+<div class="modal fade" id="deletePortfolioModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <h4 class="mb-3">Delete Portfolio</h4>
+      <p id="deleteMessage"></p>
+      <div class="d-flex justify-content-between">
+        <button class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+

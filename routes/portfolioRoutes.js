@@ -25,8 +25,9 @@ router.post('/portfolio/:id/stock/:ticker', logger, agent, authenticateToken, po
 // handle downloading financial data
 router.get('/portfolio/:id/transactions/download/', logger, agent, authenticateToken, portfolioController.downloadTransactionData);
 
-router.delete('/portfolio/:ticker', logger, agent, authenticateToken, portfolioController.deleteTicker); // delete a ticker
-router.patch('/portfolio/:ticker', logger, agent, authenticateToken, portfolioController.updateVolumeOfTicker); // update shares volume for spcific ticker
+// delete a portfolio
+router.delete('/portfolio/delete/:id', logger, agent, authenticateToken, portfolioController.deletePortfolio); 
+
 
 // auth routes
 router.post('/auth/login', redirectIfLoggedIn, authController.login); // add a new ticker 

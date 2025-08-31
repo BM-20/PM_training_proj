@@ -398,6 +398,28 @@ async function getTickerData(portfolioId, ticker) {
     return { percentageChange, returns, currStockPrice, boughtStockPrice };
 }
 
+const deletePortfolio = async (req, res) => {
+    try {
+        const { id } = req.params;        
+        const userId = req.user.id;        
+
+        const portfolio = await Portfolios.findOne({
+        where: { id, userId },
+        });
+
+        if (!portfolio) {
+        return res.status(404).json({ success: false, message: "Portfolio not found" });
+        }
+
+        await portfolio.destroy();
+        return res.json({ success: true, portfolioId: id });
+
+    } catch (err) {
+        console.error(" Error deleting:", err);
+        return res.status(500).json({ success: false, message: "Server error" });
+    }
+}
+
 const chatBot = async (req, res) => {
   try {
     const { message } = req.body;
@@ -471,7 +493,6 @@ cron.schedule("0 * * * *", async () => {  // every weekday at 22:00
 // GET /transactions/download/:portfolioId
 const downloadTransactionData = async (req, res) => {
   try {
-    console.log("HIIIIIIII ", req.params)
     const { id : portfolioId } = req.params;
 
     // Fetch ALL transactions
@@ -530,7 +551,8 @@ module.exports = {
     updateVolumeOfTicker,
     chatBot,
     createPortfolio,
-    downloadTransactionData
+    downloadTransactionData,
+    deletePortfolio
     };
 
 
