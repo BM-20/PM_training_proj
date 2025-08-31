@@ -21,7 +21,13 @@
     <%- include("partials/tickerWidget") %>
 
     <!-- Overview Section -->
-      
+      <div class="ai-disclaimer mt-3 p-3 rounded">
+        <h6 class="text-warning mb-2">⚠️ Note</h6>
+        <p class="mb-0">
+          All stock values are calculated using the current market price at the time of purchase. Historical purchase prices are not retrieved due to API limitations.  
+
+      </div>
+
 
     <div class="container-fluid py-3 mt-5">
     <div class="row">
@@ -53,28 +59,37 @@
     <button id="stockNext" class="btn btn-sm btn-outline-secondary" aria-label="Show more stocks">Show more</button>
   </div>
 
-  <!-- Recent transactions (keeps in sidebar) -->
-  <div class="mt-4">
-    <h4>Recent Transactions</h4>
-    <div class="transaction-list" style="max-height: 200px; overflow-y: auto;">
-      <% if (transactions && transactions.length > 0) { %>
-        <% transactions.slice(0, 5).forEach(t => { %>
-          <div class="transaction-item small text-muted">
-            <%= t.date.toISOString().slice(0,10) %> — 
-            <strong><%= t.ticker %></strong> 
-            (<%= t.amount > 0 ? '+' : '' %><%= t.amount %> @ $<%= t.price %>)
-          </div>
-        <% }) %>
-        <% if (transactions.length > 5) { %>
-          <div class="text-center mt-1"><small class="text-muted">Scroll for more ↓</small></div>
-        <% } %>
-      <% } else { %>
-        <p>No recent transactions.</p>
-      <% } %>
+  <!-- TRANSAXTIONS -->
+<div class="mt-4 card p-3 shadow-sm rounded-3 bg-dark">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h4 class="mb-0 text-white"> Transactions</h4>
+    <!-- Download button -->
+    <a href="/transactions/download/<%= portfolioData.id %>" 
+       class="btn btn-sm btn-outline-light" 
+       title="Download all transactions">
+       <i class="bi bi-download"></i>
+       📝
+    </a>
+  </div>
 
-          </div>
+  <div class="transaction-list mt-2">
+    <% if (transactions && transactions.length > 0) { %>
+      <% transactions.forEach(t => { %>
+        <div class="transaction-item small py-2 border-bottom border-secondary">
+          <span class="text-white"><%= t.date.toISOString().slice(0,10) %></span> — 
+          <strong class="text-primary"><%= t.ticker %></strong> 
+          <span class="<%= t.amount > 0 ? 'text-success' : 'text-danger' %>">
+            (<%= t.amount > 0 ? '+' : '' %><%= t.amount %> @ $<%= t.price %>)
+          </span>
         </div>
-      </div>
+      <% }) %>
+    <% } else { %>
+      <p class="text-white mb-0">No recent transactions.</p>
+    <% } %>
+  </div>
+</div>
+</div>
+
 
     <!-- Charts -->
       <%- include("partials/charts") %>
@@ -252,7 +267,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    const PAGE_SIZE = 5;
+    const PAGE_SIZE = 1;
     let page = 0;
 
     const container = document.getElementById('stockList');
