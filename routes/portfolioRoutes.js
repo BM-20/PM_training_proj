@@ -14,7 +14,7 @@ router.post('/portfolio/create', logger, agent, authenticateToken, portfolioCont
 router.get('/portfolio/:stocks', logger, agent, authenticateToken, portfolioController.getPortfolioStocks); 
 
 // add a new ticker to a specific portfolio
-router.post('/portfolio/:id',logger, agent, authenticateToken,  portfolioController.addTicker);
+router.post('/portfolio/:id', logger, agent, authenticateToken,  portfolioController.addTicker);
 
 // fetch a specific ticker
 router.get('/portfolio/:id/stock/:ticker', logger, agent, authenticateToken, portfolioController.getTicker);

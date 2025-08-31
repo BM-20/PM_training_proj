@@ -1,11 +1,13 @@
+const axios = require('axios')
+const cron = require("node-cron");
+const sequelize = require('../utils/connectToDB');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+
 const transactionLog = require('../models/transactions')
 const Stocks = require('../models/stocks')
 const Portfolios = require('../models/portfolios')
-const portfolioHistory = require('../models/portfolioHistory')
+const historyPortfolio = require('../models/portfolioHistory')
 
-const axios = require('axios')
-const sequelize = require('../utils/connectToDB');
-const { GoogleGenerativeAI } = require("@google/generative-ai");
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 
@@ -52,6 +54,9 @@ const createPortfolio = async (req, res) => {
         res.status(201).json({
             portfolio
         });
+
+        portfolioHistorySnapshot(portfolio.id)
+
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -63,11 +68,7 @@ const createPortfolio = async (req, res) => {
 const getPortfolioStocks = async (req, res) => { 
     allStockData = []
 
-    const portfolioHistory = [
-      { date: "2025-08-01", value: 10000 },
-      { date: "2025-08-02", value: 10200 }, 
-      { date: "2025-08-03", value: 1300 }
-    ];
+   
 
     try {
         //getting stocks for a specific user
@@ -94,14 +95,17 @@ const getPortfolioStocks = async (req, res) => {
             allStockData.push(stockInfo)
         }
 
-        console.log(`>>> All Stock data ${allStockData}`)
-   
-        const portfolioHistory = [
-            { date: "2025-08-01", value: 10000 },
-            { date: "2025-08-02", value: 10200 },
-            { date: "2025-08-03", value: 9800 }
-            ];
-        
+        //fetch portfolio history
+        let response = await historyPortfolio.findAll({
+            where :{portfolioId : portfolio.id}
+        })
+
+        const portfolioHistory = response.map(record => ({
+            date: record.dataValues.date.toISOString().split('T')[0],  // Formats date as "YYYY-MM-DD"
+            value: record.dataValues.totalValue
+            }));
+
+
         portfolioData = {
             id : req.params.stocks
         }
@@ -195,8 +199,6 @@ const addTicker = async (req, res) => {
 
         const priceBought = response.data.c;
 
-        console.log("FINANCIAL DATA __________________ ", priceBought, response.data)
-
         // Check if stock already exists in users table
         const haveStockAlready = await Stocks.findOne({
             where: { 
@@ -233,6 +235,9 @@ const addTicker = async (req, res) => {
 
         // commit the transaction if all goes well
         await t.commit();
+
+        // update portfolio history after value added
+        await portfolioHistorySnapshot(portfolio.id);
 
         return res.status(201).json({
             message: "New stock added and transaction logged",
@@ -342,6 +347,10 @@ const updateVolumeOfTicker = async (req, res) => {
     //   message: "Stock updated successfully",
     //   stock
     // });
+
+    //update profile history
+    await portfolioHistorySnapshot(portfolioId);
+
     res.redirect(`/portfolio/${portfolioId}`)
 
   } catch (error) {
@@ -385,8 +394,6 @@ async function getTickerData(portfolioId, ticker) {
     let percentageChange = ((currStockPrice - boughtStockPrice) / boughtStockPrice) * 100;
     let returns = (currStockPrice - boughtStockPrice) * boughtAmount;
 
-    console.log("HERE ", { percentageChange, returns, currStockPrice, boughtStockPrice })
-
     return { percentageChange, returns, currStockPrice, boughtStockPrice };
 }
 
@@ -422,6 +429,42 @@ const chatBot = async (req, res) => {
     res.status(500).json({ error: "Error communicating with Gemini API" });
   }
 };
+
+async function portfolioHistorySnapshot (portfolioId) {
+    
+    try {
+        // Calculate total value of portfolio
+        const allStocks = await Stocks.findAll({ where: { portfolioId } });
+        let totalValue = 0;
+
+        for (let s of allStocks) {
+            let { currStockPrice } = await getTickerData(portfolioId, s.ticker);
+            totalValue += s.amount * currStockPrice;
+        }
+
+        // Save snapshot to history
+        await historyPortfolio.create({
+            portfolioId,
+            totalValue
+        });
+        
+    } catch (error) {
+        
+        console.error(error)
+    }   
+}
+
+cron.schedule("0 * * * *", async () => {  // every weekday at 22:00
+
+    // gett all the portfolios
+    const portfolios = await Portfolios.findAll();
+    
+    for (let portfolio of portfolios) {
+        await portfolioHistorySnapshot(portfolio.id);
+    }
+
+    console.log("Updated Portfolio History Logs");
+    });
 
 
 module.exports = { 
