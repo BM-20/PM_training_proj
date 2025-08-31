@@ -320,16 +320,28 @@ const updateVolumeOfTicker = async (req, res) => {
             priceBought: newAvg
             }, { transaction: t });
 
-      } else {
+      } 
+      else 
+        {
         // SELL theredore reduce shares, avg stays same
         if (stock.amount + amount < 0) {
           await t.rollback();
           return res.status(400).json({ message: "Not enough shares to sell" });
         }
 
-        await stock.update({
+        // if sold off all remaining shares
+        else if (stock.amount + amount === 0) {
+            await stock.destroy({ transaction: t });
+        }
+
+        else
+        {
+            await stock.update({
           amount: stock.amount + amount
         }, { transaction: t });
+        }
+
+        
       }
     }
 
@@ -344,10 +356,6 @@ const updateVolumeOfTicker = async (req, res) => {
 
     await t.commit();
 
-    // return res.status(200).json({
-    //   message: "Stock updated successfully",
-    //   stock
-    // });
 
     //update profile history
     await portfolioHistorySnapshot(portfolioId);
