@@ -221,3 +221,16 @@ body {
   width: 100%;
 }
 
+.ai-disclaimer {
+  background: #1a1a1a;
+  border-left: 4px solid #ffcc00;
+  font-size: 0.9rem;
+  color: #ddd;
+}
+
+.ai-disclaimer h6 {
+  color: #ffcc00;
+  font-weight: bold;
+}
+
+

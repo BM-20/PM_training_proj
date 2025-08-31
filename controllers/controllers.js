@@ -5,12 +5,8 @@ const portfolioHistory = require('../models/portfolioHistory')
 
 const axios = require('axios')
 const sequelize = require('../utils/connectToDB');
-const { VertexAI } = require('@google/genai');
-
-// const client = new VertexAI({
-//   projectId: "your-project-id", 
-//   location: "global",
-// });
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 
 const getPortfolio = async (req, res) => { 
@@ -395,24 +391,37 @@ async function getTickerData(portfolioId, ticker) {
 }
 
 const chatBot = async (req, res) => {
-    try {
-        const { message } = req.body;
-        console.log("message -------------> " , message)
+  try {
+    const { message } = req.body;
+    if (!message) return res.status(400).json({ error: "Message is required" });
 
-        if (!message) return res.status(400).json({ error: "Message is required" });
+    // pick a model
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-        const response = await client.chat({
-        model: "gemini-2.5",
-        messages: [{ role: "user", content: message }],
-        });
+    // start chat session
+    const chat = model.startChat({
+      history: [
+        {
+          role: "user",
+          parts: [{ text: "From now on, speak like a financial advisor, giving structured investment insights with pros/cons." }],
+        },
+        {
+          role: "model",
+          parts: [{ text: "Hi! How can I help you today?" }],
+        },
+      ],
+    });
 
-        const reply = response.data.choices[0].message.content;
-        res.json({ reply });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Error communicating with Gemini API" });
-    }
-}
+    const result = await chat.sendMessage(message);
+    const reply = result.response.text();
+    res.json({ reply });
+  }
+   catch (err) 
+   {
+    console.error(err);
+    res.status(500).json({ error: "Error communicating with Gemini API" });
+  }
+};
 
 
 module.exports = { 
