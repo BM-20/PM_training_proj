@@ -5,6 +5,7 @@ const app = express();
 const portfolioRoutes = require('./routes/portfolioRoutes');
 const expressEjsLayouts = require('express-ejs-layouts');
 const cookieParser = require("cookie-parser");
+const db = require('./models/init');
 
 
 require('dotenv').config();
@@ -24,7 +25,7 @@ app.use(expressEjsLayouts)
 
 
 // connecting to the database
-sequelize.sync()
+db.Users.sequelize.sync()
   .then(() => {
     app.listen(process.env.PORT, () => {
       console.log(`Server is running on port ${process.env.PORT}`);

@@ -6,6 +6,12 @@ const { logger, agent, authenticateToken, redirectIfLoggedIn} = require('../util
 
 // portfolio routes
 router.get('/portfolio', logger, agent, authenticateToken, portfolioController.getPortfolio); // fetch all tickers
+
+// create new portfolio
+router.get('/portfolio/create', logger, agent, authenticateToken, portfolioController.createPortfolio); 
+
+
+
 router.get('/portfolio/:ticker', logger, agent, authenticateToken, portfolioController.getTicker); // fetch a specific ticker
 router.get('/portfolio/add/add',logger, agent, authenticateToken,  portfolioController.add); // add a new ticker 
 router.post('/portfolio',logger, agent, authenticateToken,  portfolioController.addTicker); // add a new ticker 

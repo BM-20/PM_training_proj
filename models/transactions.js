@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../utils/connectToDB');
-const Users = require('../models/users')
+const Portfolios = require('../models/portfolios')
 
 const transactionLog = sequelize.define("transactionLog", {
     id: {
@@ -31,12 +31,12 @@ const transactionLog = sequelize.define("transactionLog", {
     },
 
     // TODO: change the reference to the portfolio id
-    userId: {
+    portfolioId: {  
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: {
-            model: Users,
-            key: 'id'
+        references: { 
+            model: Portfolios, 
+            key: "id" 
         },
         onDelete: "CASCADE"
     }

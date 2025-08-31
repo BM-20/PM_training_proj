@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../utils/connectToDB');
-const Users = require('../models/users')
+const Portfolios = require('../models/portfolios')
 
 // each stock exists within a user portfolio
 const Stocks = sequelize.define("Stocks", { 
@@ -19,20 +19,20 @@ const Stocks = sequelize.define("Stocks", {
         allowNull: false,
         defaultValue: 0
     },
+    
     priceBought: {
         type: DataTypes.FLOAT,
         allowNull: false
     },
 
-    // TODO: change to reference for portfolio FK
-    userId: {  
+    portfolioId: {  
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: {
-            model: Users,  
-            key: "id"
+        references: { 
+            model: Portfolios, 
+            key: "id" 
         },
-        onDelete: "CASCADE"   
+        onDelete: "CASCADE"
     }
 });
 

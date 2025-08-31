@@ -1,5 +1,8 @@
 const transactionLog = require('../models/transactions')
 const Stocks = require('../models/stocks')
+const Portfolios = require('../models/portfolios')
+const portfolioHistory = require('../models/portfolioHistory')
+
 const axios = require('axios')
 const sequelize = require('../utils/connectToDB');
 const { VertexAI } = require('@google/genai');
@@ -9,13 +12,48 @@ const { VertexAI } = require('@google/genai');
 //   location: "global",
 // });
 
-// fetch all tickers
+
 const getPortfolio = async (req, res) => { 
+    try {
+
+        // fetch all the users portfolios
+        const userId = req.user.id;
+        
+        // load portfolios with stocks
+        const portfolios = await Portfolios.findAll({
+            where: { userId },
+            include: [{ model: Stocks }]
+        });
+
+        // massage data for EJS
+        const portfolioData = portfolios.map(p => {
+            const stocks = p.Stocks || [];
+            const totalValue = stocks.reduce((sum, s) => sum + (s.amount * s.priceBought), 0);
+
+            return {
+            id: p.id,
+            name: p.name,
+            totalValue,
+            stockCount: stocks.length
+            };
+        });
+
+        res.render('dashboard', { portfolios: portfolioData });
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
+
+
+
+// fetch all tickers
+const getPortfolioStocks = async (req, res) => { 
     allStockData = []
 
     const portfolioHistory = [
       { date: "2025-08-01", value: 10000 },
-      { date: "2025-08-02", value: 10200 },
+      { date: "2025-08-02", value: 10200 }, 
       { date: "2025-08-03", value: 1300 }
     ];
 

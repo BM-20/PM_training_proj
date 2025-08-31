@@ -1,4 +1,4 @@
-// Language switching
+// Language switching 
   let lang = "en";
   const translations = {
     en: { title:"📊 Stock Dashboard", overview:"Overview", chat:"AI Assistant" },
@@ -103,6 +103,39 @@ function submitNewStock() {
     //alert(data.message || "Stock added!");
     closeAddStockModal();
     location.reload(); // update portfolio
+  })
+  .catch(err => console.error(err));
+}
+
+
+
+
+
+// Open specific portfolio
+function openPortfolio(id) {
+  window.location.href = `/portfolio/${id}`;
+}
+
+// Modal handling
+ 
+function openCreatePortfolioModal() {
+  const modalEl = new bootstrap.Modal(document.getElementById('createPortfolioModal'));
+  modalEl.show();
+}
+
+function submitNewPortfolio() {
+  const name = document.getElementById("portfolioName").value.trim();
+  if (!name) return alert("Enter a name!");
+
+  fetch("/portfolio/create", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) location.reload();
+    else alert("Error creating portfolio");
   })
   .catch(err => console.error(err));
 }

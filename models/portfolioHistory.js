@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../utils/connectToDB');
-const Users = require('../models/users')
+const Portfolios = require('../models/portfolios')
 
 const PortfolioHistory = sequelize.define("PortfolioHistory", {
   id: {
@@ -17,17 +17,15 @@ const PortfolioHistory = sequelize.define("PortfolioHistory", {
     type: DataTypes.FLOAT,
     allowNull: false
   },
-    
-    userId: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            references: {
-                model: Users,
-                key: 'id'
-            },
-            onDelete: "CASCADE"
-        }
+  portfolioId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: Portfolios,
+      key: "id"
+    },
+    onDelete: "CASCADE"
+  }
 });
-
 
 module.exports = PortfolioHistory;
