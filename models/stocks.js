@@ -2,6 +2,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../utils/connectToDB');
 const Users = require('../models/users')
 
+// each stock exists within a user portfolio
 const Stocks = sequelize.define("Stocks", { 
     id: {
         type: DataTypes.INTEGER,
@@ -12,6 +13,7 @@ const Stocks = sequelize.define("Stocks", {
         type: DataTypes.STRING,
         allowNull: false
     },
+    // num of shares
     amount: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -21,6 +23,8 @@ const Stocks = sequelize.define("Stocks", {
         type: DataTypes.FLOAT,
         allowNull: false
     },
+
+    // TODO: change to reference for portfolio FK
     userId: {  
         type: DataTypes.INTEGER,
         allowNull: false,

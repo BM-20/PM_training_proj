@@ -18,14 +18,19 @@ const transactionLog = sequelize.define("transactionLog", {
         type: DataTypes.STRING,
         allowNull: false 
     },
-    priceBought: {
+    // price of stock at time of the transaction
+    price: {
         type: DataTypes.FLOAT,
         allowNull: false
     },
-    priceSold: {
+
+    // amount of stock being added or removed from their holdings
+    amount: {
         type: DataTypes.FLOAT,
         allowNull: true
     },
+
+    // TODO: change the reference to the portfolio id
     userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
