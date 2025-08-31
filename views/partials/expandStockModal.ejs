@@ -46,7 +46,7 @@
   <div class="modify-quantity rounded p-3" style="background:#1a1a1a;">
     <h6>Modify Quantity</h6>
     <form action="/portfolio/<%= portfolioId %>/stock/<%= stock.ticker %>" method="POST" class="d-flex gap-2">
-      <input type="number" name="amount" value="<%= stock.amount %>" class="form-control">
+      <input type="number" name="amount" value="" class="form-control">
       <button type="submit" class="btn btn-success flex-shrink-0">Update</button>
     </form>
   </div>

@@ -125,17 +125,6 @@ const getPortfolioStocks = async (req, res) => {
 
 const getTicker = async (req, res) => { 
     
-    // try {
-    //     const { id: userId } = req.user;
-    //     const { ticker } = req.params;
-
-    //     const data = await getTickerData(userId, ticker);
-    //     res.status(200).json(data);
-
-    // } catch (error) {
-    //     res.status(400).json({ error: error.message });
-    // }
-
     const { id : portfolioId, ticker } = req.params;
     const userId = req.user.id;
 
@@ -170,7 +159,6 @@ const getTicker = async (req, res) => {
 
 
 const addTicker = async (req, res) => {
-    console.log("JHERRRRRRRRRRRRRRRRRRRRRRRR ");
 
     let t; // Declare `t` outside try block to ensure it's accessible in both try and catch
 
@@ -270,15 +258,102 @@ const deleteTicker = async (req, res) => {
     const ticker =  req.params.ticker 
 }
 
+
+
 const updateVolumeOfTicker = async (req, res) => {  
-    res.send("Adding a new ticker...");
-}
+  const { id: portfolioId, ticker } = req.params;
+  const userId = req.user.id;
+
+  // positive = buy, negative = sell
+  const rawAmount = req.body.amount ?? req.body; 
+  const amount = parseFloat(rawAmount);
+
+  if (!Number.isFinite(amount) || amount === 0) {
+    return res.status(400).json({ message: "Invalid 'amount' — must be a non-zero number" });
+  }
 
 
-const add = async (req, res) => {  
-    res.render('dashboard')
-}
+  let t;
 
+  try {
+    t = await sequelize.transaction();
+
+    // Fetch current stock info
+    const response = await axios.get("https://finnhub.io/api/v1/quote", {
+      params: {
+        symbol: ticker.toUpperCase(),
+        token: process.env.FINHUB_API_KEY
+      }
+    });
+
+    if (!response.data || (response.data.c === 0 && response.data.t === 0)) {
+      await t.rollback();
+      return res.status(404).json({ message: "Invalid or unknown stock symbol" });
+    }
+
+    const currentPrice = response.data.c;
+
+    let stock = await Stocks.findOne({
+      where: { portfolioId, ticker },
+      transaction: t
+    });
+
+    if (!stock) {
+      // Create new stock entry if it doesn’t exist
+      if (amount <= 0) {
+        await t.rollback();
+        return res.status(400).json({ message: "Cannot sell shares you don't own" });
+      }
+    } 
+    else {
+      // Update existing stock
+      if (amount > 0) {
+
+        // BUY so recalc avg cost
+        const newAmount = stock.amount + amount;
+        const newAvg = ((stock.amount * stock.priceBought) + (amount * currentPrice)) / newAmount;
+
+        await stock.update({
+            amount: newAmount,
+            priceBought: newAvg
+            }, { transaction: t });
+
+      } else {
+        // SELL theredore reduce shares, avg stays same
+        if (stock.amount + amount < 0) {
+          await t.rollback();
+          return res.status(400).json({ message: "Not enough shares to sell" });
+        }
+
+        await stock.update({
+          amount: stock.amount + amount
+        }, { transaction: t });
+      }
+    }
+
+    // Log the transaction
+    await transactionLog.create({
+        date: new Date(),
+        ticker,
+        price: currentPrice,
+        amount, 
+        portfolioId
+        }, { transaction: t });
+
+    await t.commit();
+
+    // return res.status(200).json({
+    //   message: "Stock updated successfully",
+    //   stock
+    // });
+    res.redirect(`/portfolio/${portfolioId}`)
+
+  } catch (error) {
+    if (t) await t.rollback();
+    console.error(error);
+    return res.status(500).json({ message: "Error updating ticker", error });
+  }
+};
 
 
 
@@ -347,7 +422,6 @@ module.exports = {
     addTicker,
     deleteTicker,
     updateVolumeOfTicker,
-    add,
     chatBot,
     createPortfolio
     };
