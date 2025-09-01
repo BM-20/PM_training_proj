@@ -14,7 +14,6 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const getPortfolio = async (req, res) => { 
     try {
-
         // fetch all the users portfolios
         const userId = req.user.id;
 
@@ -24,7 +23,6 @@ const getPortfolio = async (req, res) => {
             include: [{ model: Stocks }]
         });
 
-        // massage data for EJS
         const portfolioData = portfolios.map(p => {
             const stocks = p.Stocks || [];
             const totalValue = stocks.reduce((sum, s) => sum + (s.amount * s.priceBought), 0);
@@ -67,9 +65,8 @@ const createPortfolio = async (req, res) => {
 
 // fetch all tickers
 const getPortfolioStocks = async (req, res) => { 
+    
     allStockData = []
-
-   
 
     try {
         //getting stocks for a specific user
@@ -154,14 +151,13 @@ const getTicker = async (req, res) => {
         },
         transactions
     });
-
 }
 
 
 
 const addTicker = async (req, res) => {
 
-    let t; // Declare `t` outside try block to ensure it's accessible in both try and catch
+    let t;
 
     try {
         const portfolio = await Portfolios.findByPk(req.params.id)
@@ -234,10 +230,7 @@ const addTicker = async (req, res) => {
             { transaction: t }
         );
 
-        // commit the transaction if all goes well
         await t.commit();
-
-        // update portfolio history after value added
         await portfolioHistorySnapshot(portfolio.id);
 
         return res.status(201).json({
@@ -263,6 +256,7 @@ const deleteTicker = async (req, res) => {
 
 
 const updateVolumeOfTicker = async (req, res) => {  
+    
   const { id: portfolioId, ticker } = req.params;
   const userId = req.user.id;
 
@@ -301,7 +295,6 @@ const updateVolumeOfTicker = async (req, res) => {
     });
 
     if (!stock) {
-      // Create new stock entry if it doesn’t exist
       if (amount <= 0) {
         await t.rollback();
         return res.status(400).json({ message: "Cannot sell shares you don't own" });
