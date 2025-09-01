@@ -1,104 +1,6 @@
-/*// Theme persistence
-const body = document.body;
-const THEME_KEY = 'redfolio-theme';
-const saved = localStorage.getItem(THEME_KEY);
-if (saved === 'light') body.classList.add('light');
-
-const toggleThemeBtn = document.getElementById('toggleTheme');
-const themeSwitch = document.getElementById('themeSwitch');
-const setSwitch = () => themeSwitch.classList.toggle('active', !body.classList.contains('light'));
-setSwitch();
-
-toggleThemeBtn.addEventListener('click', () => {
-    body.classList.toggle('light');
-    localStorage.setItem(THEME_KEY, body.classList.contains('light') ? 'light' : 'dark');
-    setSwitch();
-});
-
-// Password toggle & strength
-const pwd = document.getElementById('password');
-const toggle = document.getElementById('togglePwd');
-const bar = document.getElementById('strengthBar');
-
-toggle.addEventListener('click', () => {
-    const isPw = pwd.getAttribute('type') === 'password';
-    pwd.setAttribute('type', isPw ? 'text' : 'password');
-    toggle.textContent = isPw ? 'Hide' : 'Show';
-    pwd.focus();
-});
-
-function scorePassword(value) {
-    let score = 0;
-    if (!value) return 0;
-    const letters = {};
-    for (let i = 0; i < value.length; i++) {
-    letters[value[i]] = (letters[value[i]] || 0) + 1;
-    score += 5.0 / letters[value[i]];
-    }
-    const variations = {
-    digits: /\d/.test(value),
-    lower: /[a-z]/.test(value),
-    upper: /[A-Z]/.test(value),
-    nonWords: /[^\w]/.test(value)
-    };
-    let variationCount = 0;
-    for (let check in variations) variationCount += variations[check] ? 1 : 0;
-    score += (variationCount - 1) * 10;
-    score = Math.min(100, Math.floor(score));
-    return score;
-}
-
-pwd.addEventListener('input', () => {
-    const s = scorePassword(pwd.value);
-    bar.style.width = s + '%';
-    bar.style.background = s > 75 ? 'linear-gradient(90deg, #4caf50, #2e7d32)'
-                        : s > 40 ? 'linear-gradient(90deg, #ff9800, #f57c00)'
-                                : 'linear-gradient(90deg, var(--red-400), var(--red-700))';
-
-                            });
-
-const LANG_KEY = 'redfolio-lang';
-const defaultLang = 'en';
-let currentLang = localStorage.getItem(LANG_KEY) || defaultLang;
-
-const translations = {
-    en: {
-      title: "Register for Redfolio",
-      quote: "Create your account to manage your stocks.",
-      username: "username",
-      firstname: "firstname",
-      lastname: "lastname",
-      password: "Password",
-      password_quote:"Use 3–24 characters. Letters, numbers, underscores.",
-      terms = "term",
-      term_quote="I agree to the Terms & Privacy.",
-      create_account="create account",
-      sign_in_quote = "Already have an account? Sign in",
-      show: "Show",
-      hide: "Hide"
-    },
-    es: {
-        quote: "Crea tu cuenta para administrar tus acciones.",
-        username: "usuario",
-        firstname: "nombre",
-        lastname: "apellido",
-        password: "Contraseña",
-        password_quote: "Usa de 3 a 24 caracteres. Letras, números, guiones bajos.",
-        terms: "términos",
-        term_quote: "Acepto los Términos y Privacidad.",
-        create_account: "crear cuenta",
-        sign_in_quote: "¿Ya tienes una cuenta? Inicia sesión",
-        show: "Mostrar",
-        hide: "Ocultar"
-    }
-  };
-  */
- // Theme persistence
+// Theme persistence
 console.log("Register.js loading...");
 
-// Theme persistence
-
-
 const body = document.body;
 const THEME_KEY = 'redfolio-theme';
 const saved = localStorage.getItem(THEME_KEY);
@@ -113,47 +15,6 @@ toggleThemeBtn.addEventListener('click', () => {
     body.classList.toggle('light');
     localStorage.setItem(THEME_KEY, body.classList.contains('light') ? 'light' : 'dark');
     setSwitch();
-});
-
-// Password toggle & strength
-const pwd = document.getElementById('password');
-const toggle = document.getElementById('togglePwd');
-const bar = document.getElementById('strengthBar');
-
-toggle.addEventListener('click', () => {
-    const isPw = pwd.getAttribute('type') === 'password';
-    pwd.setAttribute('type', isPw ? 'text' : 'password');
-    toggle.textContent = isPw ? translations[currentLang].hide : translations[currentLang].show;
-    pwd.focus();
-});
-
-function scorePassword(value) {
-    let score = 0;
-    if (!value) return 0;
-    const letters = {};
-    for (let i = 0; i < value.length; i++) {
-        letters[value[i]] = (letters[value[i]] || 0) + 1;
-        score += 5.0 / letters[value[i]];
-    }
-    const variations = {
-        digits: /\d/.test(value),
-        lower: /[a-z]/.test(value),
-        upper: /[A-Z]/.test(value),
-        nonWords: /[^\w]/.test(value)
-    };
-    let variationCount = 0;
-    for (let check in variations) variationCount += variations[check] ? 1 : 0;
-    score += (variationCount - 1) * 10;
-    score = Math.min(100, Math.floor(score));
-    return score;
-}
-
-pwd.addEventListener('input', () => {
-    const s = scorePassword(pwd.value);
-    bar.style.width = s + '%';
-    bar.style.background = s > 75 ? 'linear-gradient(90deg, #4caf50, #2e7d32)'
-                        : s > 40 ? 'linear-gradient(90deg, #ff9800, #f57c00)'
-                                : 'linear-gradient(90deg, var(--red-400), var(--red-700))';
 });
 
 // Language system
@@ -196,41 +57,118 @@ const translations = {
     }
 };
 
+// Password toggle & strength
+const pwd = document.getElementById('password');
+const toggle = document.getElementById('togglePwd');
+const bar = document.getElementById('strengthBar');
+
+toggle.addEventListener('click', () => {
+    const isPw = pwd.getAttribute('type') === 'password';
+    pwd.setAttribute('type', isPw ? 'text' : 'password');
+    toggle.textContent = isPw ? translations[currentLang].hide : translations[currentLang].show;
+    pwd.focus();
+});
+
+function scorePassword(value) {
+    let score = 0;
+    if (!value) return 0;
+    const letters = {};
+    for (let i = 0; i < value.length; i++) {
+        letters[value[i]] = (letters[value[i]] || 0) + 1;
+        score += 5.0 / letters[value[i]];
+    }
+    const variations = {
+        digits: /\d/.test(value),
+        lower: /[a-z]/.test(value),
+        upper: /[A-Z]/.test(value),
+        nonWords: /[^\w]/.test(value)
+    };
+    let variationCount = 0;
+    for (let check in variations) variationCount += variations[check] ? 1 : 0;
+    score += (variationCount - 1) * 10;
+    score = Math.min(100, Math.floor(score));
+    return score;
+}
+
+pwd.addEventListener('input', () => {
+    const s = scorePassword(pwd.value);
+    bar.style.width = s + '%';
+    bar.style.background = s > 75 ? 'linear-gradient(90deg, #4caf50, #2e7d32)'
+                        : s > 40 ? 'linear-gradient(90deg, #ff9800, #f57c00)'
+                                : 'linear-gradient(90deg, var(--red-400), var(--red-700))';
+});
+
 // Function to apply translations to the page
 function applyTranslations() {
     const lang = translations[currentLang];
     
-    // Update title and subtitle
-    document.querySelector('h1').innerHTML = `${currentLang === 'en' ? 'Register for' : 'Registro para'} <span style="color: var(--red-400)">Redfolio</span>`;
-    document.querySelector('.sub').textContent = lang.quote;
+    // Update title
+    const titlePrefix = document.getElementById('titlePrefix');
+    if (titlePrefix) {
+        titlePrefix.textContent = currentLang === 'en' ? 'Register for' : 'Registro para';
+    }
+    
+    // Update subtitle
+    const quote = document.getElementById('quote');
+    if (quote) {
+        quote.textContent = lang.quote;
+    }
     
     // Update form labels
-    document.querySelector('label[for="firstname"]').textContent = lang.firstname_label;
-    document.querySelector('label[for="lastname"]').textContent = lang.lastname_label;
-    document.querySelector('label[for="username"]').textContent = lang.username_label;
-    document.querySelector('label[for="password"]').textContent = lang.password_label;
+    const firstnameLabel = document.getElementById('firstnameLabel');
+    if (firstnameLabel) firstnameLabel.textContent = lang.firstname_label;
+    
+    const lastnameLabel = document.getElementById('lastnameLabel');
+    if (lastnameLabel) lastnameLabel.textContent = lang.lastname_label;
+    
+    const usernameLabel = document.getElementById('usernameLabel');
+    if (usernameLabel) usernameLabel.textContent = lang.username_label;
+    
+    const passwordLabel = document.getElementById('passwordLabel');
+    if (passwordLabel) passwordLabel.textContent = lang.password_label;
     
     // Update help texts
-    document.getElementById('userNameHelp').textContent = lang.username_help;
-    document.getElementById('pwdHint').textContent = lang.password_help;
+    const usernameHelp = document.getElementById('usernameHelp');
+    if (usernameHelp) usernameHelp.textContent = lang.username_help;
+    
+    const passwordHelp = document.getElementById('passwordHelp');
+    if (passwordHelp) passwordHelp.textContent = lang.password_help;
     
     // Update terms text
-    document.querySelector('.meta').innerHTML = `${lang.terms_text.replace('Terms & Privacy', '<a href="#" style="color: var(--red-300); text-decoration: none;">Términos</a> & <a href="#" style="color: var(--red-300); text-decoration: none;">Privacidad</a>')}`;
+    const termsText = document.getElementById('termsText');
+    if (termsText) {
+        termsText.innerHTML = currentLang === 'en' 
+            ? 'I agree to the <a href="#" style="color: var(--red);">Terms</a> & <a href="#" style="color: var(--red);">Privacy</a>.'
+            : 'Acepto los <a href="#" style="color: var(--red);">Términos</a> & <a href="#" style="color: var(--red);">Privacidad</a>.';
+    }
     
     // Update button texts
-    document.querySelector('button[type="submit"]').textContent = lang.create_account;
-    document.querySelector('.btn-ghost .meta').textContent = lang.toggle_theme;
+    const createBtn = document.getElementById('createBtn');
+    if (createBtn) createBtn.textContent = lang.create_account;
+    
+    const themeToggleText = document.getElementById('themeToggleText');
+    if (themeToggleText) themeToggleText.textContent = lang.toggle_theme;
     
     // Update footer
-    document.querySelector('.footer').innerHTML = `${lang.sign_in_quote.replace('Sign in', '<a href="#" style="color: var(--red-300); text-decoration: none;">Inicia sesión</a>')}`;
+    const footerText = document.getElementById('footerText');
+    if (footerText) {
+        footerText.innerHTML = currentLang === 'en'
+            ? 'Already have an account? <a href="/auth/login" style="color: var(--red);">Sign in</a>'
+            : '¿Ya tienes una cuenta? <a href="/auth/login" style="color: var(--red);">Inicia sesión</a>';
+    }
     
     // Update password toggle button
     const passwordToggle = document.getElementById('togglePwd');
-    const isPasswordVisible = pwd.getAttribute('type') === 'text';
-    passwordToggle.textContent = isPasswordVisible ? lang.hide : lang.show;
+    if (passwordToggle) {
+        const isPasswordVisible = pwd.getAttribute('type') === 'text';
+        passwordToggle.textContent = isPasswordVisible ? lang.hide : lang.show;
+    }
     
     // Update language button
-    document.getElementById('langBtn').textContent = currentLang === 'en' ? 'ES' : 'EN';
+    const langBtn = document.getElementById('toggleLang');
+    if (langBtn) {
+        langBtn.textContent = currentLang === 'en' ? 'ES' : 'EN';
+    }
 }
 
 // Function to switch language
@@ -240,13 +178,14 @@ function switchLanguage() {
     applyTranslations();
 }
 
-// Apply translations when page loads
+// Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
+    // Apply initial translations
     applyTranslations();
+    
+    // Add event listener for language toggle button
+    const toggleLangBtn = document.getElementById('toggleLang');
+    if (toggleLangBtn) {
+        toggleLangBtn.addEventListener('click', switchLanguage);
+    }
 });
-
-
-
-
-
-

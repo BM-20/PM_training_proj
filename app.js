@@ -25,7 +25,12 @@ app.get("/", (req, res) => {
 app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'views'))
 app.use(expressEjsLayouts)
+// swagger setup
 
+const { swaggerUi, specs } = require('./swagger');
+
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // connecting to the database
 sequelize.sync()
@@ -37,3 +42,5 @@ sequelize.sync()
   .catch((err) => {
     console.error('Unable to connect to the database:', err);
   });
+
+
