@@ -127,7 +127,27 @@ const getPortfolioStocks = async (req, res) => {
     }
     
 }
-
+/**
+ * @swagger
+ * /api/ticker/{ticker}:
+ *   get:
+ *     summary: Get stock data
+ *     tags: [Stocks]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - name: ticker
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: AAPL
+ *     responses:
+ *       200:
+ *         description: Stock data retrieved
+ *       400:
+ *         description: Invalid ticker
+ */
 const getTicker = async (req, res) => { 
     
     const { id : portfolioId, ticker } = req.params;
@@ -154,7 +174,43 @@ const getTicker = async (req, res) => {
 }
 
 
-
+// TODO : FIX ERROR CODES
+// NOTE: making the assumption that as the user adds a stock to the system we are 
+// its value is determined by current pricing. Finhub api doesnt offer historical data for free
+/**
+ * @swagger
+ * /api/ticker:
+ *   post:
+ *     summary: Add new stock
+ *     tags: [Stocks]
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - ticker
+ *               - amount
+ *             properties:
+ *               ticker:
+ *                 type: string
+ *                 example: AAPL
+ *               amount:
+ *                 type: integer
+ *                 example: 10
+ *     responses:
+ *       201:
+ *         description: Stock added successfully
+ *       400:
+ *         description: Missing required fields
+ *       403:
+ *         description: Stock already exists
+ *       404:
+ *         description: Invalid stock symbol
+ */
 const addTicker = async (req, res) => {
 
     let t;
@@ -256,7 +312,7 @@ const deleteTicker = async (req, res) => {
 
 
 const updateVolumeOfTicker = async (req, res) => {  
-    
+
   const { id: portfolioId, ticker } = req.params;
   const userId = req.user.id;
 

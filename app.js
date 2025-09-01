@@ -15,14 +15,23 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.json());
 app.use(express.urlencoded({extended : true}))
 app.use(cookieParser());
+app.use(express.static('public'))
 app.use('/', portfolioRoutes);
-
-
+/*
+app.get("/", (req, res) => {
+  res.send("Server is up and running ✅");
+});
+*/
 // ejs setup
 app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'views'))
 app.use(expressEjsLayouts)
+// swagger setup
 
+const { swaggerUi, specs } = require('./swagger');
+
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // connecting to the database
 db.Users.sequelize.sync()
@@ -34,3 +43,5 @@ db.Users.sequelize.sync()
   .catch((err) => {
     console.error('Unable to connect to the database:', err);
   });
+
+
