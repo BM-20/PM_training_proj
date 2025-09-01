@@ -105,13 +105,16 @@ function closeAddStockModal() {
 }
 
 function submitNewStock() {
-
   const ticker = document.getElementById("newStockTicker").value.toUpperCase();
   const amount = parseInt(document.getElementById("newStockAmount").value);
+  const date = document.getElementById("newStockDate").value; // <-- capture date
 
-  if(!ticker || !amount) { alert("Please fill out both fields!"); return; }
+  if (!ticker || !amount || !date) { 
+    alert("Please fill out all fields (ticker, amount, and date)!"); 
+    return; 
+  }
 
-  // find the id of the portfolio
+  // find the id of the portfolio from URL
   const pathSegments = window.location.pathname.split('/'); 
   const id = pathSegments[pathSegments.length - 1]; 
   if (!id) return alert("ID is missing from the URL!");
@@ -119,13 +122,12 @@ function submitNewStock() {
   fetch(`/portfolio/${id}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ticker, amount })
+    body: JSON.stringify({ ticker, amount, date }) // <-- include date in payload
   })
   .then(res => res.json())
   .then(data => {
-    //alert(data.message || "Stock added!");
     closeAddStockModal();
-    location.reload(); // update portfolio
+    location.reload(); // refresh portfolio view
   })
   .catch(err => console.error(err));
 }

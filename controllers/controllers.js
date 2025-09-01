@@ -3,6 +3,7 @@ const cron = require("node-cron");
 const ExcelJS = require("exceljs");
 const sequelize = require('../utils/connectToDB');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const yahooFinance = require('yahoo-finance2').default;
 
 const transactionLog = require('../models/transactions')
 const Stocks = require('../models/stocks')
@@ -12,35 +13,129 @@ const historyPortfolio = require('../models/portfolioHistory')
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 
+const home = async (req, res) => {
+    res.render("home") 
+}
+
+
 const getPortfolio = async (req, res) => { 
     try {
-        // fetch all the users portfolios
         const userId = req.user.id;
-
-        // load portfolios with stocks
         const portfolios = await Portfolios.findAll({
             where: { userId },
             include: [{ model: Stocks }]
         });
 
+        const N = 5; // max tickers to return per portfolio
+
         const portfolioData = portfolios.map(p => {
             const stocks = p.Stocks || [];
             const totalValue = stocks.reduce((sum, s) => sum + (s.amount * s.priceBought), 0);
 
+            // pick first N tickers (you can also sort by value or amount before slicing if needed)
+            const tickers = stocks.slice(0, N).map(s => s.ticker);
+
             return {
-            id: p.id,
-            name: p.name,
-            totalValue,
-            stockCount: stocks.length
+                id: p.id,
+                name: p.name,
+                totalValue,
+                stockCount: stocks.length,
+                tickers // 👈 added here
             };
         });
 
-        res.render('dashboard', { portfolios: portfolioData });
+        const totalPortfolioValue = portfolioData.reduce((sum, p) => sum + p.totalValue, 0);
+        const bestPortfolio = portfolioData.reduce((max, p) => p.totalValue > max.totalValue ? p : max, portfolioData[0]);
+        const worstPortfolio = portfolioData.reduce((min, p) => p.totalValue < min.totalValue ? p : min, portfolioData[0]);
+
+        const pieChartData = portfolioData.map(p => ({
+            name: p.name,
+            value: p.totalValue
+        }));
+
+        const lineChartData = [
+            { date: "2025-08-01", value: totalPortfolioValue * 0.8 },
+            { date: "2025-08-15", value: totalPortfolioValue * 0.9 },
+            { date: "2025-09-01", value: totalPortfolioValue }
+        ];
+
+        console.log({ 
+            portfolios: portfolioData, 
+            totalPortfolioValue,
+            bestPortfolio,
+            worstPortfolio,
+            pieChartData,
+            lineChartData
+        })
+
+        res.render("dashboard", { 
+            portfolios: portfolioData, 
+            totalPortfolioValue,
+            bestPortfolio,
+            worstPortfolio,
+            pieChartData,
+            lineChartData
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to load portfolios" });
+    }
+};
+
+
+async function getHistoricalData(ticker, date) {
+    try {
+        if (!ticker) throw new Error("No ticker provided");
+        if (!date) throw new Error("No date provided");
+
+        // Convert date string to Date object
+        const startDate = new Date(date);
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + 1); // add 1 day for range
+
+        const queryOptions = {
+            period1: startDate,
+            period2: endDate,
+            interval: '1d'
+        };
+
+        // Fetch historical data
+        const historicalData = await yahooFinance.historical(ticker.toUpperCase(), queryOptions);
+
+        if (!historicalData || historicalData.length === 0) {
+            console.log(`No data available for ${ticker} on ${date}`);
+            return null;
+        }
+
+        console.log("TESTING THE API ____ ", historicalData);
+        return historicalData;
 
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error("Error fetching historical data:", err.message);
+        return null;
     }
+
 }
+
+
+const getTickerDataStock = async (req, res) => { 
+
+  try {
+    const userId = req.user.id; // however you track users
+    const stocks = await Stocks.findAll({ where: { userId } });
+
+    // Transform into TradingView format
+    const symbols = stocks.map(stock => ({
+      proName: `NASDAQ:${stock.ticker}`, // adjust exchange prefix
+      title: stock.ticker
+    }));
+
+    res.json(symbols);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to load tickers" });
+  }
+}
+
 
 
 // creates a new portfolio
@@ -224,9 +319,12 @@ const addTicker = async (req, res) => {
             });
         }
 
-        const { ticker, amount } = req.body;
+        const { ticker, amount, date } = req.body;
 
-        if (!ticker || !amount ) {
+        console.log("HIHIIHHI  , ", { ticker, amount, date } )
+
+        if (!ticker || !amount || !date) {
+            
             return res.status(400).json({
                 message: "Ticker, date and amount are required"
             });
@@ -237,20 +335,27 @@ const addTicker = async (req, res) => {
         const userId = req.user.id;
 
         // Fetch the current stock price
-        const response = await axios.get("https://finnhub.io/api/v1/quote", {
-            params: {
-                symbol: ticker.toUpperCase(),
-                token: process.env.FINHUB_API_KEY
-            }
-        });
+        // const response = await axios.get("https://finnhub.io/api/v1/quote", {
+        //     params: {
+        //         symbol: ticker.toUpperCase(),
+        //         token: process.env.FINHUB_API_KEY
+        //     }
+        // });
 
-        // check if the ticker exists
-        if (!response.data || (response.data.c === 0 && response.data.t === 0)) {
+        let response  = await getHistoricalData(ticker, date)
+
+        if (!response ) {
             await t.rollback();
             return res.status(404).json({ message: "Invalid or unknown stock symbol" });
         }
 
-        const priceBought = response.data.c;
+        // check if the ticker exists
+        // if (!response.data || (response.data.c === 0 && response.data.t === 0)) {
+        //     await t.rollback();
+        //     return res.status(404).json({ message: "Invalid or unknown stock symbol" });
+        // }
+
+        const priceBought = response[0].close;
 
         // Check if stock already exists in users table
         const haveStockAlready = await Stocks.findOne({
@@ -320,6 +425,9 @@ const updateVolumeOfTicker = async (req, res) => {
   const rawAmount = req.body.amount ?? req.body; 
   const amount = parseFloat(rawAmount);
 
+  const rawDate = req.body.date; 
+  const date = rawDate ? new Date(rawDate) : null; 
+
   if (!Number.isFinite(amount) || amount === 0) {
     return res.status(400).json({ message: "Invalid 'amount' — must be a non-zero number" });
   }
@@ -328,22 +436,34 @@ const updateVolumeOfTicker = async (req, res) => {
   let t;
 
   try {
+
     t = await sequelize.transaction();
 
     // Fetch current stock info
-    const response = await axios.get("https://finnhub.io/api/v1/quote", {
-      params: {
-        symbol: ticker.toUpperCase(),
-        token: process.env.FINHUB_API_KEY
-      }
-    });
+    // const response = await axios.get("https://finnhub.io/api/v1/quote", {
+    //   params: {
+    //     symbol: ticker.toUpperCase(),
+    //     token: process.env.FINHUB_API_KEY
+    //   }
+    // });
 
-    if (!response.data || (response.data.c === 0 && response.data.t === 0)) {
-      await t.rollback();
-      return res.status(404).json({ message: "Invalid or unknown stock symbol" });
+    // if (!response.data || (response.data.c === 0 && response.data.t === 0)) {
+    //   await t.rollback();
+    //   return res.status(404).json({ message: "Invalid or unknown stock symbol" });
+    // }
+
+    // const currentPrice = response.data.c;
+
+    let response  = await getHistoricalData(ticker, date)
+
+    console.log(" UP TO DATE ", response)
+
+    if (!response ) {
+        await t.rollback();
+        return res.status(404).json({ message: "Invalid or unknown stock symbol" });
     }
 
-    const currentPrice = response.data.c;
+    const currentPrice = response[0].close;
 
     let stock = await Stocks.findOne({
       where: { portfolioId, ticker },
@@ -368,8 +488,8 @@ const updateVolumeOfTicker = async (req, res) => {
             amount: newAmount,
             priceBought: newAvg
             }, { transaction: t });
+        } 
 
-      } 
       else 
         {
         // SELL theredore reduce shares, avg stays same
@@ -609,7 +729,9 @@ module.exports = {
     chatBot,
     createPortfolio,
     downloadTransactionData,
-    deletePortfolio
+    deletePortfolio,
+    getTickerDataStock,
+    home
     };
 
 

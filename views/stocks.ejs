@@ -97,19 +97,42 @@
 
       <!-- Add Stock Modal -->
       <div class="modal fade" id="addStockModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content p-3">
-            <h4 class="mb-3">Add New Stock</h4>
-            <input type="text" id="newStockTicker" placeholder="Ticker Symbol" class="form-control mb-2">
-            <input type="number" id="newStockAmount" placeholder="Amount" class="form-control mb-3">
-            <div class="d-flex justify-content-between">
-              <button class="btn btn-success" onclick="submitNewStock()">Submit</button>
-              <button class="btn btn-secondary" onclick="closeAddStockModal()">Cancel</button>
-            </div>
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-3">
+          <h4 class="mb-3">Add New Stock</h4>
+          
+          <!-- Stock Ticker -->
+          <input 
+            type="text" 
+            id="newStockTicker" 
+            placeholder="Ticker Symbol" 
+            class="form-control mb-2"
+          >
+
+          <!-- Amount -->
+          <input 
+            type="number" 
+            id="newStockAmount" 
+            placeholder="Amount" 
+            class="form-control mb-2"
+          >
+
+          <!-- Purchase Date -->
+          <input 
+            type="date" 
+            id="newStockDate" 
+            class="form-control mb-3"
+          >
+
+          <!-- Buttons -->
+          <div class="d-flex justify-content-between">
+            <button class="btn btn-success" onclick="submitNewStock()">Submit</button>
+            <button class="btn btn-secondary" onclick="closeAddStockModal()">Cancel</button>
           </div>
         </div>
       </div>
     </div>
+
 
     <!-- expand stock info modal  -->
      <div class="modal fade" id="stockModal" tabindex="-1" aria-hidden="true">
@@ -139,59 +162,93 @@
     const portfolioHistory = <%- JSON.stringify(portfolioHistory) %>;
     const values = stocks.map(stock => stock.amount * stock.currStockPrice);
 
-    // Pie chart for stock allocation (by amount of shares)
-    const pieCtx = document.getElementById('pieChart').getContext('2d');
-    new Chart(pieCtx, {
-      type: 'pie',
-      data: {
-        labels: stocks.map(s => s.ticker),
-        datasets: [{
-          label: 'Share Allocation',
-          data: stocks.map(s => s.amount),
-          backgroundColor: ['#0d6efd','#4CAF50','#FF4136','#FFC107','#6610f2','#20c997']
-        }]
-      },
-      options: { plugins: { legend: { labels: { color: '#fff' } } } }
-    });
+    // Define a muted professional palette
+const palette = [
+  '#7F1D1D', // deep wine red
+  '#9B2C2C', // strong crimson
+  '#B91C1C', // bold red
+  '#DC2626', // vivid scarlet
+  '#F87171', // soft coral red
+  '#FCA5A5', // light rose
+  '#E5E7EB', // light grey
+  '#9CA3AF', // medium grey
+  '#4B5563', // slate grey
+  '#1F2937'  // near black grey
+];
 
-    // Second Pie Chart (value split)
-    const valuePieCtx = document.getElementById('valuePieChart').getContext('2d');
-    new Chart(valuePieCtx, {
-      type: 'pie',
-      data: {
-        labels: stocks.map(s => s.ticker),
-        datasets: [{
-          label: 'Value Split',
-          data: values,
-          backgroundColor: ['#ff6384','#36a2eb','#ffce56','#4bc0c0','#9966ff','#ff9f40']
-        }]
-      },
-      options: { plugins: { legend: { labels: { color: '#fff' } } } }
-    });
 
-    // Line chart for portfolio growth
-    const lineCtx = document.getElementById('lineChart').getContext('2d');
-    new Chart(lineCtx, {
-      type: 'line',
-      data: {
-        labels: portfolioHistory.map(p => p.date),
-        datasets: [{
-          label: 'Portfolio Value',
-          data: portfolioHistory.map(p => p.value),
-          borderColor: '#0d6efd',
-          backgroundColor: 'rgba(13,110,253,0.2)',
-          fill: true,
-          tension: 0.3
-        }]
-      },
-      options: {
-        plugins: { legend: { labels: { color: '#fff' } } },
-        scales: {
-          x: { ticks: { color: '#fff' }, grid: { color: '#333' } },
-          y: { ticks: { color: '#fff' }, grid: { color: '#333' } }
-        }
-      }
-    });
+// Pie chart for stock allocation (by amount of shares)
+const pieCtx = document.getElementById('pieChart').getContext('2d');
+new Chart(pieCtx, {
+  type: 'pie',
+  data: {
+    labels: stocks.map(s => s.ticker),
+    datasets: [{
+      label: 'Share Allocation',
+      data: stocks.map(s => s.amount),
+      backgroundColor: palette.slice(0, stocks.length),
+      borderColor: '#222', // thin dark border
+      borderWidth: 1
+    }]
+  },
+  options: {
+    plugins: { 
+      legend: { labels: { color: '#fff', font: { size: 14 } } }
+    }
+  }
+});
+
+// Second Pie Chart (value split)
+const valuePieCtx = document.getElementById('valuePieChart').getContext('2d');
+new Chart(valuePieCtx, {
+  type: 'pie',
+  data: {
+    labels: stocks.map(s => s.ticker),
+    datasets: [{
+      label: 'Value Split',
+      data: values,
+      backgroundColor: palette.slice(0, stocks.length),
+      borderColor: '#222',
+      borderWidth: 1
+    }]
+  },
+  options: {
+    plugins: { 
+      legend: { labels: { color: '#fff', font: { size: 14 } } }
+    }
+  }
+});
+
+// Line chart for portfolio growth
+const lineCtx = document.getElementById('lineChart').getContext('2d');
+new Chart(lineCtx, {
+  type: 'line',
+  data: {
+    labels: portfolioHistory.map(p => p.date),
+    datasets: [{
+      label: 'Portfolio Value',
+      data: portfolioHistory.map(p => p.value),
+      borderColor: '#4e79a7', // consistent muted blue
+      backgroundColor: 'rgba(78,121,167,0.2)',
+      fill: true,
+      tension: 0.35, // slight curve
+      pointRadius: 3,
+      pointBackgroundColor: '#fff',
+      pointBorderColor: '#4e79a7'
+    }]
+  },
+  options: {
+    plugins: { 
+      legend: { labels: { color: '#fff', font: { size: 14 } } },
+      tooltip: { mode: 'index', intersect: false }
+    },
+    interaction: { mode: 'nearest', axis: 'x', intersect: false },
+    scales: {
+      x: { ticks: { color: '#fff' }, grid: { color: '#444' } },
+      y: { ticks: { color: '#fff' }, grid: { color: '#444' } }
+    }
+  }
+});
 
   document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll('.stock-link').forEach(link => {
@@ -327,11 +384,7 @@
     updateButtons();
   });
 
-
-
-    
   </script>
- 
 
 </body>
 </html>

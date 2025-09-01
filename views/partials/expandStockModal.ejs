@@ -42,13 +42,32 @@
     </ul>
   </div>
 
-  <!-- Modify Quantity -->
-  <div class="modify-quantity rounded p-3" style="background:#1a1a1a;">
-    <h6>Modify Quantity</h6>
-    <form action="/portfolio/<%= portfolioId %>/stock/<%= stock.ticker %>" method="POST" class="d-flex gap-2">
-      <input type="number" name="amount" value="" class="form-control">
-      <button type="submit" class="btn btn-success flex-shrink-0">Update</button>
-    </form>
-  </div>
+ <!-- Modify Quantity -->
+<div class="modify-quantity rounded p-3" style="background:#1a1a1a;">
+  <h6>Modify Quantity</h6>
+  <form action="/portfolio/<%= portfolioId %>/stock/<%= stock.ticker %>" method="POST" class="d-flex gap-2">
+
+  <!-- Amount (normal size) -->
+  <input 
+    type="number" 
+    name="amount" 
+    class="form-control flex-grow-1" 
+    placeholder="Enter amount" 
+    required
+  >
+  
+  <!-- Date (takes more space) -->
+  <input 
+    type="date" 
+    name="date" 
+    class="form-control flex-grow-2" 
+    required
+  >
+
+  <!-- Submit -->
+  <button type="submit" class="btn btn-success flex-shrink-0">Update</button>
+</form>
+
 </div>
+
 

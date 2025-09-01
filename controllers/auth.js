@@ -70,10 +70,7 @@ const login = async (req, res) => {
                     httpOnly: true,
                     secure: process.env.NODE_ENV === "production",
                 })
-                // .status(200)
-                .redirect('/porfolio')
-                // .json({ message: "Logged in successfully" });
-                
+                .redirect('/portfolio')               
             } 
             catch (error) {
                 console.log("error loging in " , error)

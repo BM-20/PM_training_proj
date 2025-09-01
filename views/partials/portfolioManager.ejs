@@ -1,22 +1,41 @@
-<!-- Portfolios Section -->
+<!-- Portfolios Section --> 
 <h2 id="overviewTitle">Your Portfolios</h2>
 <div class="row g-3" id="portfolioGrid">
   <% if (portfolios && portfolios.length > 0) { %>
     <% portfolios.forEach(p => { %>
       <div class="col-md-4">
-        <div class="portfolio-card" onclick="openPortfolio('<%= p.id %>')">
-            <!-- Delete button -->
-            <button class="delete-btn" onclick="confirmDelete(event, '<%= p.id %>', '<%= p.name %>')">
-              <i class='bx bx-trash'></i>
-            </button>
+        <div class="portfolio-card position-relative" onclick="openPortfolio('<%= p.id %>')">
+          
+          <!-- Delete button -->
+          <button class="delete-btn position-absolute top-0 end-0 m-2" onclick="confirmDelete(event, '<%= p.id %>', '<%= p.name %>')">
+            <i class='bx bx-trash'></i>
+          </button>
 
-            <h4><%= p.name %></h4>
-            <p>Total Value: $<%= p.totalValue.toFixed(2) %></p>
-            <p>Stocks: <%= p.stockCount %></p>
+          <h4 class="mt-2"><%= p.name %></h4>
+          <p>Total Value: $<%= p.totalValue.toFixed(2) %></p>
+          <p>Stocks: <%= p.stockCount %></p>
+
+          <!-- Stock tickers as red boxes -->
+          <div class="d-flex flex-wrap gap-2 mt-2 justify-content-center">
+            <% if (p.tickers && p.tickers.length > 0) { %>
+              <% p.tickers.forEach(ticker => { %>
+                <span class="ticker-box"><%= ticker %></span>
+              <% }) %>
+            <% } else { %>
+              <small class="text-muted">No stocks yet</small>
+            <% } %>
+          </div>
+
         </div>
       </div>
     <% }) %>
+  <% } else { %>
+    <div class="col-12">
+      <p class="text-muted">You don't have any portfolios yet.</p>
+    </div>
   <% } %>
+
+
 
   <!-- Create new portfolio block -->
   <div class="col-md-4">
@@ -26,7 +45,6 @@
     </div>
   </div>
 </div>
-  </div>
 
   <!-- Modal: Create Portfolio -->
   <div class="modal fade" id="createPortfolioModal" tabindex="-1" aria-hidden="true">

@@ -1,8 +1,12 @@
 const express = require('express');
 const router = express.Router();
+
 const portfolioController = require('../controllers/controllers');
 const authController = require('../controllers/auth');
 const { logger, agent, authenticateToken, redirectIfLoggedIn} = require('../utils/middleware');
+
+
+router.get('/home', logger, agent, portfolioController.home);
 
 // portfolio routes
 router.get('/portfolio', logger, agent, authenticateToken, portfolioController.getPortfolio); // fetch all tickers
@@ -28,6 +32,9 @@ router.get('/portfolio/:id/transactions/download/', logger, agent, authenticateT
 // delete a portfolio
 router.delete('/portfolio/delete/:id', logger, agent, authenticateToken, portfolioController.deletePortfolio); 
 
+router.get('/portfolio-tickers', logger, agent, authenticateToken, portfolioController.getTickerDataStock);
+
+
 
 // auth routes
 router.post('/auth/login', redirectIfLoggedIn, authController.login); // add a new ticker 
@@ -37,8 +44,6 @@ router.get('/auth/register', redirectIfLoggedIn, authController.register); // ad
 
 // chat bot
 router.post('/api/chat', logger, agent, authenticateToken, portfolioController.chatBot); // add a new ticker 
-
-
-
+// 
 
 module.exports = router;
