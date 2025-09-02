@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Register • Redfolio</title>
+  <link rel="stylesheet" href="/css/register.css">
+</head>
+<body>
+  <div class="wrapper">
+    <section class="panel" role="main">
+      <header class="panel__header">
+        <h1 class="brand">
+          <span id="titlePrefix">Register for</span>
+          <span class="brand-red">Redfolio</span>
+        </h1>
+        <button type="button" id="toggleLang" class="btn btn-pill" aria-label="Switch language">
+          ES
+        </button>
+      </header>
+
+      <p class="sub" id="quote">Create your account to manage your stocks.</p>
+
+      <form id="registerForm" action="/auth/register" method="post" novalidate>
+        <div class="row half">
+          <div>
+            <label for="firstname" id="firstnameLabel">First name</label>
+            <div class="input">
+              <input type="text" id="firstname" name="firstname" autocomplete="given-name" required placeholder="Alisha" />
+            </div>
+          </div>
+          <div>
+            <label for="lastname" id="lastnameLabel">Last name</label>
+            <div class="input">
+              <input type="text" id="lastname" name="lastname" autocomplete="family-name" required placeholder="Thapa" />
+            </div>
+          </div>
+        </div>
+
+        <div class="row full">
+          <label for="username" id="usernameLabel">Username</label>
+          <div class="input">
+            <input type="text" id="username" name="username" autocomplete="username" required placeholder="@alisha.trades" minlength="3" />
+          </div>
+          <small class="help" id="usernameHelp">Use 3–24 characters. Letters, numbers, underscores.</small>
+        </div>
+
+        <div class="row full">
+          <label for="password" id="passwordLabel">Password</label>
+          <div class="input input--pw">
+            <input type="password" id="password" name="password" autocomplete="new-password" required minlength="8" placeholder="••••••••" />
+            <button type="button" class="btn btn-ghost" id="togglePwd" aria-label="Show password">Show</button>
+          </div>
+          <div class="password-tools">
+            <div class="strength"><span id="strengthBar"></span></div>
+            <small class="help" id="passwordHelp">Use 8+ chars with a mix of letters, numbers & symbols.</small>
+          </div>
+        </div>
+
+        <div class="checkbox-row">
+          <input type="checkbox" id="terms" required />
+          <span class="meta" id="termsText">I agree to the <a href="#" style="color: var(--red);">Terms</a> & <a href="#" style="color: var(--red);">Privacy</a>.</span>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" type="submit" id="createBtn">Create account</button>
+          
+          <div class="actions-row">
+            <button class="btn btn-ghost" type="button" id="toggleTheme" style="position:static; transform:none; padding:10px 14px;">
+              <span class="switch" id="themeSwitch"><span></span></span>
+              &nbsp;<span class="meta" id="themeToggleText">Toggle light / dark</span>
+            </button>
+          </div>
+        </div>
+
+        <p class="footer" id="footerText">Already have an account? <a href="/auth/login" style="color: var(--red);">Sign in</a></p>
+      </form>
+    </section>
+  </div>
+
+  <script src="/js/register.js"></script>
+</body>
+</html>
